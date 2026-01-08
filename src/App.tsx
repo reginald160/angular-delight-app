@@ -4,10 +4,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard";
+import VisaDashboard from "./pages/VisaDashboard";
+import HousingDashboard from "./pages/HousingDashboard";
+import JobsDashboard from "./pages/JobsDashboard";
+import DrivingDashboard from "./pages/DrivingDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +30,11 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/visa" element={<ProtectedRoute><VisaDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/housing" element={<ProtectedRoute><HousingDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/jobs" element={<ProtectedRoute><JobsDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/driving" element={<ProtectedRoute><DrivingDashboard /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
