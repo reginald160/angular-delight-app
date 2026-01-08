@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { Mail, ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
   Form,
@@ -16,6 +15,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+
+const API_BASE_URL = 'http://localhost:8082/api/v1';
 
 const forgotPasswordSchema = z.object({
   email: z.string().trim().email({ message: 'Please enter a valid email address' }),
@@ -37,19 +38,28 @@ export default function ForgotPassword() {
   const handleSubmit = async (data: ForgotPasswordFormData) => {
     setIsSubmitting(true);
     
-    const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    
-    setIsSubmitting(false);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email }),
+      });
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      const result = await response.json().catch(() => null);
+      
+      setIsSubmitting(false);
+
+      if (!response.ok) {
+        toast.error(result?.message || 'Failed to send reset email');
+        return;
+      }
+
+      setEmailSent(true);
+      toast.success('Password reset email sent!');
+    } catch {
+      setIsSubmitting(false);
+      toast.error('Network error. Please try again.');
     }
-
-    setEmailSent(true);
-    toast.success('Password reset email sent!');
   };
 
   return (

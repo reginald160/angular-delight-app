@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Lock, Eye, EyeOff, ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import {
@@ -17,6 +16,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+
+const API_BASE_URL = 'http://localhost:8082/api/v1';
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
@@ -33,7 +34,8 @@ export default function ResetPassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isValidSession, setIsValidSession] = useState(false);
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
   const navigate = useNavigate();
 
   const form = useForm<ResetPasswordFormData>({
@@ -44,36 +46,39 @@ export default function ResetPassword() {
     },
   });
 
-  useEffect(() => {
-    // Check if user has a valid recovery session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setIsValidSession(true);
-      }
-    });
-  }, []);
-
   const handleSubmit = async (data: ResetPasswordFormData) => {
     setIsSubmitting(true);
     
-    const { error } = await supabase.auth.updateUser({
-      password: data.password,
-    });
-    
-    setIsSubmitting(false);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          token,
+          password: data.password,
+        }),
+      });
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      const result = await response.json().catch(() => null);
+      
+      setIsSubmitting(false);
+
+      if (!response.ok) {
+        toast.error(result?.message || 'Failed to reset password');
+        return;
+      }
+
+      setIsSuccess(true);
+      toast.success('Password updated successfully!');
+      
+      // Redirect to auth after 3 seconds
+      setTimeout(() => {
+        navigate('/auth');
+      }, 3000);
+    } catch {
+      setIsSubmitting(false);
+      toast.error('Network error. Please try again.');
     }
-
-    setIsSuccess(true);
-    toast.success('Password updated successfully!');
-    
-    // Redirect to home after 3 seconds
-    setTimeout(() => {
-      navigate('/');
-    }, 3000);
   };
 
   return (
@@ -129,15 +134,15 @@ export default function ResetPassword() {
               </h2>
               <p className="text-muted-foreground mb-8">
                 Your password has been successfully updated. 
-                You'll be redirected to the home page shortly.
+                You'll be redirected to the login page shortly.
               </p>
-              <Link to="/">
+              <Link to="/auth">
                 <Button variant="royal" className="w-full h-12 text-base">
-                  Go to Home
+                  Go to Sign In
                 </Button>
               </Link>
             </div>
-          ) : !isValidSession ? (
+          ) : !token ? (
             <div className="text-center">
               <h2 className="font-serif text-3xl font-bold text-foreground mb-2">
                 Invalid or Expired Link
