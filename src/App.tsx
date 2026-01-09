@@ -15,6 +15,7 @@ import HousingDashboard from "./pages/HousingDashboard";
 import JobsDashboard from "./pages/JobsDashboard";
 import DrivingDashboard from "./pages/DrivingDashboard";
 import NotFound from "./pages/NotFound";
+import AuthGuard from "./contexts/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -30,11 +31,11 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/visa" element={<ProtectedRoute><VisaDashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/housing" element={<ProtectedRoute><HousingDashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/jobs" element={<ProtectedRoute><JobsDashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/driving" element={<ProtectedRoute><DrivingDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+            <Route path="/dashboard/visa" element={<AuthGuard><VisaDashboard /></AuthGuard>} />
+            <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} />
+            <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} />
+            <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
