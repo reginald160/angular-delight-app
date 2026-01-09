@@ -14,6 +14,144 @@ export type Database = {
   }
   public: {
     Tables: {
+      job_alerts: {
+        Row: {
+          created_at: string
+          email_frequency: string | null
+          id: string
+          is_active: boolean | null
+          job_types: string[] | null
+          keywords: string[] | null
+          locations: string[] | null
+          min_salary: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email_frequency?: string | null
+          id?: string
+          is_active?: boolean | null
+          job_types?: string[] | null
+          keywords?: string[] | null
+          locations?: string[] | null
+          min_salary?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email_frequency?: string | null
+          id?: string
+          is_active?: boolean | null
+          job_types?: string[] | null
+          keywords?: string[] | null
+          locations?: string[] | null
+          min_salary?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      job_applications: {
+        Row: {
+          applied_at: string
+          cover_letter: string | null
+          cv_id: string | null
+          id: string
+          job_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          applied_at?: string
+          cover_letter?: string | null
+          cv_id?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          applied_at?: string
+          cover_letter?: string | null
+          cv_id?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_cv_id_fkey"
+            columns: ["cv_id"]
+            isOneToOne: false
+            referencedRelation: "user_cvs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          company: string
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          job_type: string | null
+          location: string
+          posted_at: string
+          requirements: string[] | null
+          salary_max: number | null
+          salary_min: number | null
+          skills: string[] | null
+          title: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          job_type?: string | null
+          location: string
+          posted_at?: string
+          requirements?: string[] | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills?: string[] | null
+          title: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          job_type?: string | null
+          location?: string
+          posted_at?: string
+          requirements?: string[] | null
+          salary_max?: number | null
+          salary_min?: number | null
+          skills?: string[] | null
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -42,6 +180,74 @@ export type Database = {
           id?: string
           last_name?: string | null
           phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_jobs: {
+        Row: {
+          id: string
+          job_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          job_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          job_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_jobs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_cvs: {
+        Row: {
+          analysis_result: Json | null
+          content_text: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          is_primary: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_result?: Json | null
+          content_text?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          is_primary?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json | null
+          content_text?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          is_primary?: boolean | null
           updated_at?: string
           user_id?: string
         }
