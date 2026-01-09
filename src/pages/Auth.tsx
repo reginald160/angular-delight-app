@@ -88,7 +88,7 @@ export default function Auth() {
     }
 
     toast.success('Welcome back!');
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const handleSignup = async (data: SignupFormData) => {
@@ -110,7 +110,6 @@ export default function Auth() {
     toast.success('Account created successfully! Welcome to UK Pathway.');
     navigate('/');
   };
-
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -261,7 +260,6 @@ export default function Auth() {
                     'Sign In'
                   )}
                 </Button>
-
               </form>
             </Form>
           ) : (
@@ -308,7 +306,8 @@ export default function Auth() {
                   />
                 </div>
 
-                <FormField
+              <div>
+                  <FormField
                   control={signupForm.control}
                   name="email"
                   render={({ field }) => (
@@ -324,12 +323,14 @@ export default function Auth() {
                             className="pl-10 h-12"
                           />
                         </div>
+                        
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
+              </div>
                 <FormField
                   control={signupForm.control}
                   name="password"
@@ -403,7 +404,6 @@ export default function Auth() {
                     'Create Account'
                   )}
                 </Button>
-
               </form>
             </Form>
           )}
