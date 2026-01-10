@@ -1,44 +1,42 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
-  FileText, 
-  Home, 
   Briefcase, 
-  Car, 
+  Users,
+  Bell,
+  MessageSquare,
   LogOut, 
   User,
   Menu,
   X,
-  Settings
+  Home
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { NotificationBell } from '@/components/notifications/NotificationBell';
-import { ChatPanel } from '@/components/chat/ChatPanel';
-import { ProfileModal } from '@/components/profile/ProfileModal';
 
-interface DashboardLayoutProps {
+interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/dashboard/visa', label: 'Visa Support', icon: FileText },
-  { path: '/dashboard/housing', label: 'Housing', icon: Home },
-  { path: '/dashboard/jobs', label: 'Jobs', icon: Briefcase },
-  { path: '/dashboard/driving', label: 'Driving', icon: Car },
+  { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/admin/jobs', label: 'Manage Jobs', icon: Briefcase },
+  { path: '/admin/users', label: 'Users', icon: Users },
+  { path: '/admin/notifications', label: 'Notifications', icon: Bell },
+  { path: '/admin/chats', label: 'Chats', icon: MessageSquare },
 ];
 
-export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
+export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
+    navigate('/');
   };
 
   return (
@@ -53,13 +51,12 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-hero flex items-center justify-center">
-              <span className="text-primary-foreground font-serif font-bold text-sm">UK</span>
+            <div className="w-8 h-8 rounded-lg bg-destructive flex items-center justify-center">
+              <span className="text-destructive-foreground font-serif font-bold text-sm">A</span>
             </div>
-            <span className="font-serif font-bold text-foreground">UK Pathway</span>
+            <span className="font-serif font-bold text-foreground">Admin Panel</span>
           </div>
         </div>
-        <NotificationBell />
       </header>
 
       {/* Sidebar */}
@@ -73,12 +70,12 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
-            <div className="w-10 h-10 rounded-lg bg-hero flex items-center justify-center">
-              <span className="text-primary-foreground font-serif font-bold text-lg">UK</span>
+            <div className="w-10 h-10 rounded-lg bg-destructive flex items-center justify-center">
+              <span className="text-destructive-foreground font-serif font-bold text-lg">A</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-serif font-bold text-foreground">UK Pathway</span>
-              <span className="text-xs text-muted-foreground">Dashboard</span>
+              <span className="font-serif font-bold text-foreground">Admin Panel</span>
+              <span className="text-xs text-muted-foreground">UK Pathway</span>
             </div>
           </div>
 
@@ -95,7 +92,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                     isActive
-                      ? "bg-primary text-primary-foreground"
+                      ? "bg-destructive text-destructive-foreground"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
@@ -116,20 +113,12 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <p className="text-sm font-medium text-foreground truncate">
                   {user?.email}
                 </p>
-                <p className="text-xs text-muted-foreground">Member</p>
+                <p className="text-xs text-destructive font-medium">Admin</p>
               </div>
             </div>
             <Button
               variant="outline"
               className="w-full justify-start gap-3"
-              onClick={() => setProfileOpen(true)}
-            >
-              <Settings className="w-4 h-4" />
-              Edit Profile
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full justify-start gap-3 mt-2"
               onClick={handleSignOut}
             >
               <LogOut className="w-4 h-4" />
@@ -159,12 +148,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           {children}
         </div>
       </main>
-
-      {/* Chat Panel */}
-      <ChatPanel />
-      
-      {/* Profile Modal */}
-      <ProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
     </div>
   );
 };

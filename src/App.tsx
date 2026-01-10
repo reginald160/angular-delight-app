@@ -16,6 +16,11 @@ import JobsDashboard from "./pages/JobsDashboard";
 import DrivingDashboard from "./pages/DrivingDashboard";
 import NotFound from "./pages/NotFound";
 import AuthGuard from "./contexts/AuthGuard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminJobs from "./pages/admin/AdminJobs";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminChats from "./pages/admin/AdminChats";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +41,11 @@ const App = () => (
             <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} />
             <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} />
             <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} />
+            <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
+            <Route path="/admin/jobs" element={<AuthGuard><AdminJobs /></AuthGuard>} />
+            <Route path="/admin/users" element={<AuthGuard><AdminUsers /></AuthGuard>} />
+            <Route path="/admin/notifications" element={<AuthGuard><AdminNotifications /></AuthGuard>} />
+            <Route path="/admin/chats" element={<AuthGuard><AdminChats /></AuthGuard>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
