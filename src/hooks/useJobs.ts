@@ -15,6 +15,8 @@ export interface Job {
   requirements: string[] | null;
   skills: string[] | null;
   posted_at: string;
+  created_at?: string;
+  expires_at?: string | null;
   is_active: boolean;
 }
 
