@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8082/api/v1';
+const API_BASE_URL = 'https://dummyjson.com';
 
 export interface AuthUser {
   id: string;
@@ -23,6 +23,8 @@ class AuthApiService {
     try {
         
       const token = localStorage.getItem("accessToken");
+
+      console.log("Using token:", token);
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         // credentials: 'include', // Include cookies for session management
@@ -60,7 +62,7 @@ class AuthApiService {
   async login(email: string, password: string): Promise<{ data: AuthResponse | null; error: AuthError | null }> {
     return this.request<AuthResponse>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username: "emilys", password : "emilyspass" }),
     });
   }
 
@@ -88,9 +90,30 @@ class AuthApiService {
     return { error };
   }
 
-  async getCurrentUser(): Promise<{ data: AuthUser | null; error: AuthError | null }> {
-    return this.request<AuthUser>('/auth/me');
+  async getCurrentUser(email:string): Promise<{ data: AuthUser | null; error: AuthError | null }> {
+      const url = `/auth/getUser?email=${encodeURIComponent(email)}`;
+    const result =  this.request<AuthUser>("/user/me");
+    console.log("getCurrentUser result", result);
+
+    return result;
   }
+
+  async getAuthUser(): Promise<AuthUser | null> {
+  const userData = localStorage.getItem("authUser");
+
+  if (!userData) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(userData) as AuthUser;
+  } catch {
+    return null;
+  }
+};
+  
+
+
 }
 
 export const authApi = new AuthApiService();

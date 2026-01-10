@@ -18,9 +18,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
+  console.log("ctr", ctx)
   if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
   return ctx;
 };
+
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -28,14 +30,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadCurrentUser = async () => {
+  const loadCurrentUser = async (email: string) => {
     try {
-      const { data, error } = await authApi.getCurrentUser(); // GET /users/me
+      const { data, error } = await authApi.getCurrentUser(email); // GET /users/me
       if (error || !data) {
         setUser(null);
         return;
       }
       setUser(data);
+      localStorage.setItem("authUser", JSON.stringify(data));
     } catch {
       setUser(null);
     }
@@ -50,8 +53,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-      await loadCurrentUser();
+      await loadCurrentUser(localStorage.getItem("email") || "");
       setLoading(false);
+       const cached = localStorage.getItem("authUser");
+      if (cached) setUser(JSON.parse(cached));
     })();
   }, []);
 
@@ -77,9 +82,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     localStorage.setItem("accessToken", data.accessToken);
     localStorage.setItem("refreshToken", data.refreshToken);
+      localStorage.setItem("email", email);
 
     // IMPORTANT: hydrate user immediately so ProtectedRoute passes
-    await loadCurrentUser();
+    await loadCurrentUser(email);
 
     return { error: null };
   };
@@ -90,6 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("authUser");
+    localStorage.removeItem("email");
     setUser(null);
   };
 
