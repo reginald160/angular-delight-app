@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { authApi, AuthUser } from "@/services/AuthService";
 
 export interface Job {
   id: string;
@@ -67,6 +68,19 @@ export interface CVAnalysis {
   overallSummary: string;
 }
 
+export interface FileUploadDto {
+  id: string;            // Guid -> string in JSON
+  name: string;
+  userId: string;        // Guid -> string
+  type: string;
+  path: string;
+  size: number;          // double -> number
+  total: number;         // long -> number (safe up to 2^53-1)
+  totalBytes: number;    // long -> number
+  dateUpdated: string;   // DateTimeOffset -> ISO string
+}
+
+
 export function useJobs() {
   const { user } = useAuth();
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -101,7 +115,7 @@ export function useJobs() {
     const { data, error } = await supabase
       .from('job_applications')
       .select('*, job:jobs(*)')
-      .eq('user_id', user.id)
+      .eq('user_id', user.Id)
       .order('applied_at', { ascending: false });
 
     if (error) {
@@ -118,7 +132,7 @@ export function useJobs() {
     const { data, error } = await supabase
       .from('saved_jobs')
       .select('*, job:jobs(*)')
-      .eq('user_id', user.id)
+      .eq('user_id', user.Id)
       .order('saved_at', { ascending: false });
 
     if (error) {
@@ -135,7 +149,7 @@ export function useJobs() {
     const { data, error } = await supabase
       .from('job_alerts')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('user_id', user.Id);
 
     if (error) {
       console.error('Error fetching alerts:', error);
@@ -148,27 +162,36 @@ export function useJobs() {
   const fetchUserCV = async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from('user_cvs')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('is_primary', true)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching CV:', error);
-      return;
-    }
-    
-    // Cast the analysis_result to CVAnalysis type
-    if (data) {
-      setUserCV({
-        ...data,
-        analysis_result: data.analysis_result as unknown as CVAnalysis | null
-      });
-    } else {
+     const result = await authApi.getCV(user.Email);
+     if(result.error || !result.data) {
+      console.error("Error fetching CV:", result.error);
       setUserCV(null);
-    }
+      return;
+     }
+     
+    setUserCV({
+        id: result.data?.id || user.Id,
+        file_name: result.data?.name || user.CV,
+        file_path: result.data?.path || user.CV,
+        file_size: result.data?.size || 1024,
+        content_text: "sample CV text",
+        analysis_result: null,
+        is_primary: false,
+        created_at: result.data.dateUpdated || new Date().toISOString(),
+      });
+    
+     setUserCV({
+        id: user.Id,
+        file_name: user.CV,
+        file_path: user.CV,
+        file_size: 1024,
+        content_text: "sample CV text",
+        analysis_result: null,
+        is_primary: false,
+        created_at: new Date().toISOString(),
+      });
+
+
   };
 
   // Apply for a job
@@ -181,7 +204,7 @@ export function useJobs() {
     const { error } = await supabase
       .from('job_applications')
       .insert({
-        user_id: user.id,
+        user_id: user.Id,
         job_id: jobId,
         cv_id: userCV?.id,
         cover_letter: coverLetter,
@@ -216,7 +239,7 @@ export function useJobs() {
       const { error } = await supabase
         .from('saved_jobs')
         .delete()
-        .eq('user_id', user.id)
+        .eq('user_id', user.Id)
         .eq('job_id', jobId);
 
       if (error) {
@@ -227,7 +250,7 @@ export function useJobs() {
     } else {
       const { error } = await supabase
         .from('saved_jobs')
-        .insert({ user_id: user.id, job_id: jobId });
+        .insert({ user_id: user.Id, job_id: jobId });
 
       if (error) {
         toast.error('Failed to save job');
@@ -249,7 +272,7 @@ export function useJobs() {
     const { error } = await supabase
       .from('job_alerts')
       .insert({
-        user_id: user.id,
+        user_id: user.Id,
         keywords: alert.keywords,
         locations: alert.locations,
         job_types: alert.job_types,

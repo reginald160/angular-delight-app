@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import {chatService} from '@/services/ChatService';
-import {v4 as uuidv4} from 'uuid'
 
 export interface ChatMessage {
   id: string;
@@ -13,16 +12,6 @@ export interface ChatMessage {
   content: string;
   is_read: boolean;
   created_at: string;
-}
-
-export interface SignalRChatMessage {
-  id: string;
-  conversation_id: string;
-  sender_id: string;
-  content: string;
-  is_read: boolean;
-  created_at: string;
-  role: string
 }
 
 export interface ChatConversation {
@@ -35,9 +24,8 @@ export interface ChatConversation {
   status: string;
 }
 
-const SIGNALR_HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || '';
 
-export const useChat = () => {
+export const useSignalRChat = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
@@ -47,7 +35,6 @@ export const useChat = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [connected, setConnected] = useState(false);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(false); 
 
   // Initialize SignalR connection
   const initializeConnection = useCallback(async () => {
@@ -56,17 +43,17 @@ export const useChat = () => {
     try {
       const connection = new signalR.HubConnectionBuilder()
         .withUrl(SIGNALR_HUB_URL, {
-           skipNegotiation: true,  // skipNegotiation as we specify WebSockets
-          transport: signalR.HttpTransportType.WebSockets  // force WebSocket transport
+          accessTokenFactory: async () => {
+            const { data } = await supabase.auth.getSession();
+            return data.session?.access_token || '';
+          }
         })
         .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
         .configureLogging(signalR.LogLevel.Warning)
         .build();
 
-        const topic = user.role === "Admin" ? "ReceiveAdminMessage" : "ReceiveUserMessage";
       // Handle incoming messages
-      connection.on(topic, (message: ChatMessage) => {
-
+      connection.on('ReceiveChatMessage', (message: ChatMessage) => {
         if (message.sender_id !== user.id) {
           setMessages(prev => {
             // Avoid duplicates
@@ -75,15 +62,13 @@ export const useChat = () => {
           });
           
           // Show toast for new messages
-          if (!isChatOpen) {
           toast({
             title: 'New Message',
             description: message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
           });
         }
-        }
       });
-  
+
       // Handle conversation updates
       connection.on('ConversationUpdated', (conversation: ChatConversation) => {
         setConversations(prev => {
@@ -128,8 +113,7 @@ export const useChat = () => {
       console.error('Failed to connect to SignalR chat hub:', error);
       // Fallback: connection failed, we'll rely on polling or Supabase realtime
     }
-  }, [user, toast, currentConversation, isChatOpen]);
-
+  }, [user, toast, currentConversation]);
 
   // Cleanup connection on unmount
   useEffect(() => {
@@ -149,7 +133,6 @@ export const useChat = () => {
   }, [user, initializeConnection]);
 
   const fetchConversations = async () => {
-    
     if (!user) return;
     
     try {
@@ -184,12 +167,12 @@ export const useChat = () => {
       
         const { data, error } =  await chatService.GetMessagesByConversationId(conversationId);
         const mappedMessages: ChatMessage[] = (data || []).map((item: any) => ({
-                id: item.id,
-                conversation_id: item.conversationId,
-                sender_id: item.senderId,
-                content: item.content,
-                is_read: item.ssRead,
-                created_at: item.createdAt
+                id: item.Id,
+                conversation_id: item.ConversationId,
+                sender_id: item.SenderId,
+                content: item.Content,
+                is_read: item.IsRead,
+                created_at: item.CreatedAt
               }));
 
       if (error) throw error;
@@ -200,11 +183,11 @@ export const useChat = () => {
   };
 
   const createConversation = async () => {
-      if (!user) return null;
+    if (!user) return null;
     
     try {
       // Check if user already has an open conversation
-      const { data: existing , error: coreerror} =  await chatService.GetUserConversation(user.id);
+      const { data: existing } =  await chatService.GetUserConversation(user.id);
 
       if (existing != null) {
         const conversation = {
@@ -221,14 +204,12 @@ export const useChat = () => {
         await fetchMessages(conversation.id);
         // Join the conversation via SignalR
         if (connectionRef.current?.state === signalR.HubConnectionState.Connected) {
-          //await connectionRef.current.invoke('JoinConversation', conversation.id);
+          await connectionRef.current.invoke('JoinConversation', conversation.id);
         }
         return conversation;
       }
 
       const { data, error } = await chatService.CreateConversation(user.id);
-
-        const { data: exisnewing } =  await chatService.GetUserConversation(user.id);
 
       const newConversation = {
         id: data?.id || data.id,
@@ -276,35 +257,25 @@ export const useChat = () => {
     }
 
     try {
-  
-        const time = new Date().toISOString();
-        const messageId = uuidv4();
+      // Insert message to database
+      const { data, error } = await chatService.SendMessage(content, user.id);
+
+      if (error) throw error;
       const newMessage: ChatMessage = {
-        id: messageId,
+        id: data.MessageId || '',
         conversation_id: convId,
         sender_id: user.id,
         content: content,
         is_read: false,
-        created_at: time
-      };  
+        created_at: new Date().toISOString()
+      };
       
       // Add message to local state immediately
       setMessages(prev => [...prev, newMessage]);
 
       // Send via SignalR for real-time delivery to other participants
       if (connectionRef.current?.state === signalR.HubConnectionState.Connected) {
-
-          const newMessage: SignalRChatMessage = {
-        id: messageId,
-        conversation_id: convId,
-        sender_id: user.id,
-        content: content,
-        is_read: false,
-        created_at: time,
-        role : user.role
-      }; 
-        
-        await connectionRef.current.invoke('SendChatMessage', convId, newMessage);
+        await connectionRef.current.invoke('SendChatMessage', convId, data);
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -382,8 +353,6 @@ export const useChat = () => {
     createConversation,
     sendMessage,
     selectConversation,
-    refresh: fetchConversations,
-    setIsChatOpen,
-    isChatOpen
+    refresh: fetchConversations
   };
 };

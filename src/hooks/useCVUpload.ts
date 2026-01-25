@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { authApi, AuthUser } from "@/services/AuthService";
+import axios from "axios";
 
 export function useCVUpload(onSuccess?: () => void) {
   const { user } = useAuth();
@@ -28,48 +30,36 @@ export function useCVUpload(onSuccess?: () => void) {
 
     try {
       // Upload to storage
-      const filePath = `${user.id}/${Date.now()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from('cvs')
-        .upload(filePath, file);
+      const fileName = `${Date.now()}-${file.name}`;
+       const formData = new FormData();
+      formData.append("file", file, fileName); // must match API parameter name: IFormFile file
+        const endpoint = authApi.getBaseUrl() + "/files/upload";
 
-      if (uploadError) {
-        throw uploadError;
+        const token = localStorage.getItem("accessToken");
+       const response = await axios.post(endpoint, formData, {
+        headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+ 
+        onUploadProgress: (evt) => {
+          if (!evt.total) return;
+          const percent = Math.round((evt.loaded * 100) / evt.total);
+          //setProgress(percent);
+        },
+      });
+
+      if(response.status !== 200) {
+
+        toast.error('Failed to upload CV');
+        return;
       }
 
-      // Read file content as text (for PDFs, we'll just store the filename for now)
-      let contentText = '';
-      if (file.type.includes('text') || file.name.endsWith('.txt')) {
-        contentText = await file.text();
-      }
-
-      // Mark all existing CVs as non-primary
-      await supabase
-        .from('user_cvs')
-        .update({ is_primary: false })
-        .eq('user_id', user.id);
-
-      // Save CV metadata
-      const { data: cvData, error: dbError } = await supabase
-        .from('user_cvs')
-        .insert({
-          user_id: user.id,
-          file_name: file.name,
-          file_path: filePath,
-          file_size: file.size,
-          content_text: contentText || null,
-          is_primary: true
-        })
-        .select()
-        .single();
-
-      if (dbError) {
-        throw dbError;
-      }
-
+      const filePath = response.data.filePath;
+         setUploading(false);
+      
       toast.success('CV uploaded successfully!');
       onSuccess?.();
-      return cvData;
+      return filePath;
     } catch (error) {
       console.error('Error uploading CV:', error);
       toast.error('Failed to upload CV');
@@ -102,6 +92,8 @@ export function useCVUpload(onSuccess?: () => void) {
       }
 
       if (data?.analysis) {
+
+        console.log('CV analysis result:', data.analysis);
         // Save analysis results to the CV record
         await supabase
           .from('user_cvs')
@@ -126,10 +118,13 @@ export function useCVUpload(onSuccess?: () => void) {
   const deleteCV = async (cvId: string, filePath: string) => {
     try {
       // Delete from storage
-      await supabase.storage.from('cvs').remove([filePath]);
-      
-      // Delete from database
-      await supabase.from('user_cvs').delete().eq('id', cvId);
+
+      const response = await authApi.deleteCVFile();
+      if (response.error) {
+        console.error('Error deleting CV:', response.error);
+        toast.error('Failed to delete CV');
+        return;
+      }
       
       toast.success('CV deleted');
       onSuccess?.();
