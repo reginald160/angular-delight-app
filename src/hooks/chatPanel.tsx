@@ -10,12 +10,13 @@ import { cn } from '@/lib/utils';
 
 export const ChatPanel = () => {
   const { user } = useAuth();
-  const { messages, currentConversation, sendMessage, createConversation } = useChat();
+  const { messages, currentConversation, sendMessage, createConversation, setIsChatOpen } = useChat();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleOpen = async () => {
     setIsOpen(true);
@@ -40,6 +41,11 @@ export const ChatPanel = () => {
       handleSend();
     }
   };
+
+  useEffect(() => {
+      setIsChatOpen(isOpen);
+    }, [isOpen, setIsChatOpen]);
+  
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -91,7 +97,7 @@ export const ChatPanel = () => {
         </div>
       </div>
 
-      {!isMinimized && (        
+      {!isMinimized && (
         <>
           {/* Messages */}
           <ScrollArea className="h-[380px] p-4" ref={scrollRef}>
@@ -103,7 +109,6 @@ export const ChatPanel = () => {
             ) : (
               <div className="space-y-4">
                 {messages.map((message) => (
-                  
                   <div
                     key={message.id}
                     className={cn(
@@ -126,7 +131,7 @@ export const ChatPanel = () => {
                           ? "text-primary-foreground/70"
                           : "text-muted-foreground"
                       )}>
-                        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                        {/* {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })} */}
                       </p>
                     </div>
                   </div>

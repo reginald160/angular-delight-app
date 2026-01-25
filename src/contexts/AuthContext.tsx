@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { authApi, AuthUser } from "@/services/AuthService";
+import { authApi, AuthUser, LoginUser } from "@/services/AuthService";
 
 interface AuthContextType {
-  user: AuthUser | null;
+  user: LoginUser | null;
   loading: boolean;
   signUp: (
     email: string,
@@ -27,7 +27,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<LoginUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadCurrentUser = async (email: string) => {

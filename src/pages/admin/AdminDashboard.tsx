@@ -14,7 +14,7 @@ export default function AdminDashboard() {
       </div>
     );
   }
-
+   
   if (!isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }

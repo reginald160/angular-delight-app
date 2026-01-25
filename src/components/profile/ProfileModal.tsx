@@ -1,18 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useProfile, Profile } from '@/hooks/useProfile';
-import { Loader2, User } from 'lucide-react';
+import { Loader2, Pi, User } from 'lucide-react';
+import {authApi} from "@/services/AuthService";
 
 interface ProfileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const ProfileModal = ({ open, onOpenChange }: ProfileModalProps) => {
+export const ProfileModal = ({ open, onOpenChange }: ProfileModalProps) =>  {
+
+    
   const { profile, loading, updateProfile } = useProfile();
+
+
   const [formData, setFormData] = useState({
     first_name: profile?.first_name || '',
     last_name: profile?.last_name || '',
@@ -34,9 +39,42 @@ export const ProfileModal = ({ open, onOpenChange }: ProfileModalProps) => {
     onOpenChange(false);
   };
 
+
+ useEffect(() => {
+  if (!open) return;
+
+  const loadUser = async () => {
+    try {
+      const resp = await authApi.getCurrentUser1('');
+    
+      console.log('User data:', resp);
+      profile.first_name = resp.data?.firstName ?? null;
+      profile.last_name = resp.data?.lastName ?? null;
+      profile.phone = resp.data?.phone ?? null;
+
+       setFormData({
+        first_name: profile.first_name || 'Obi',
+        last_name: profile.last_name || 'Eze',
+        phone: profile.phone || ''
+      });
+
+      // await updateProfile({
+      //   first_name: resp.data?.FirstName ?? null,
+      //   last_name: resp.data?.LastName ?? null,
+      //   phone: resp.data?.Phone ?? null
+      // });
+    } catch (err) {
+      console.error('Failed to load user', err);
+    }
+  };
+
+  loadUser();
+}, [open]);
+
   // Update form when profile loads
   useState(() => {
     if (profile) {
+       
       setFormData({
         first_name: profile.first_name || '',
         last_name: profile.last_name || '',

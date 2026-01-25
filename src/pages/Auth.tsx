@@ -17,6 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { authApi } from '@/services/AuthService';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Please enter a valid email address' }),
@@ -48,6 +49,7 @@ export default function Auth() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   useEffect(() => {
+
     if (user) {
       navigate('/');
     }
@@ -87,10 +89,40 @@ export default function Auth() {
       }
       return;
     }
-
     toast.success('Welcome back!');
-    navigate('/dashboard');
+  
+    const loginUser = await authApi.getCurrentAuthUser();
+    const role = loginUser.Role;
+    if(role === 'Admin'){
+      navigate('/admin');
+    }
+    else{
+      navigate('/dashboard');
+    };
+
+  
+   
+  
   };
+
+  const CheckRole = async () => {
+
+   const data = await authApi.getCurrentAuthUser();
+
+    if (!data) {
+      toast.error('Failed to retrieve user role.');
+      return;
+    }
+   const role = data.Role;
+
+    if(role === 'Admin'){
+      navigate('/admin');
+    }
+    else{
+      navigate('/dashboard');
+    }
+
+  }
 
   const handleSignup = async (data: SignupFormData) => {
     setIsSubmitting(true);

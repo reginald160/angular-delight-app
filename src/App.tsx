@@ -21,6 +21,7 @@ import AdminJobs from "./pages/admin/AdminJobs";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminChats from "./pages/admin/AdminChats";
+import EmailConfirmation from "./pages/EmailConfirmation";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+               <Route path="/Confirm" element={<EmailConfirmation />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />

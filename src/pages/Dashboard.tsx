@@ -49,7 +49,7 @@ const recentActivity = [
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const firstName = 'there'; // User metadata not available from custom API
+  const firstName = user?.firstName;   // User metadata not available from custom API
 
   return (
     <DashboardLayout>
