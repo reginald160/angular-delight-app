@@ -149,12 +149,12 @@ export const useChat = () => {
 
       // Handle connection state changes
       connection.onreconnecting(() => {
-        console.log('SignalR reconnecting...');
+        //console.log('SignalR reconnecting...');
         setConnected(false);
       });
 
       connection.onreconnected(() => {
-        console.log('SignalR reconnected');
+        //console.log('SignalR reconnected');
         setConnected(true);
         // Rejoin conversation if one is selected
         if (currentConversation) {
@@ -163,14 +163,14 @@ export const useChat = () => {
       });
 
       connection.onclose(() => {
-        console.log('SignalR connection closed');
+        //console.log('SignalR connection closed');
         setConnected(false);
       });
 
       await connection.start();
       connectionRef.current = connection;
       setConnected(true);
-      console.log('SignalR chat connected');
+      //console.log('SignalR chat connected');
 
     } catch (error) {
       console.error('Failed to connect to SignalR chat hub:', error);

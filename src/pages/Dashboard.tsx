@@ -6,8 +6,43 @@ import { FileText, Home, Briefcase, Car, ArrowRight, CheckCircle, Clock, AlertCi
 import { useAuth } from '@/contexts/AuthContext';
 import { authApi } from '@/services/AuthService';
 import { useProfile } from '@/hooks/useProfile';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { SERVICE_CONFIG } from '@/services/appService';
 
+const ALL_SERVICES = [
+  {
+    id: 'visa',
+    title: 'Visa Support',
+    description: 'Track your visa applications and get expert guidance',
+    icon: FileText,
+    path: '/dashboard/visa',
+    color: 'bg-blue-500/10 text-blue-600',
+  },
+  {
+    id: 'housing',
+    title: 'Housing',
+    description: 'Find your perfect home in the UK',
+    icon: Home,
+    path: '/dashboard/housing',
+    color: 'bg-green-500/10 text-green-600',
+  },
+  {
+    id: 'jobs',
+    title: 'Jobs',
+    description: 'Discover career opportunities across the UK',
+    icon: Briefcase,
+    path: '/dashboard/jobs',
+    color: 'bg-purple-500/10 text-purple-600',
+  },
+  {
+    id: 'driving',
+    title: 'Driving',
+    description: 'License conversion and driving resources',
+    icon: Car,
+    path: '/dashboard/driving',
+    color: 'bg-orange-500/10 text-orange-600',
+  },
+];
 
 const services = [
   {
@@ -55,7 +90,13 @@ const recentActivity = [
 export default function Dashboard() {
   const { user } = useAuth();
   const firstName = user?.firstName;   // User metadata not available from custom API
-  const {fetchUserActivities, recentActivities} = useProfile()
+  const {fetchUserActivities, recentActivities} = useProfile();
+
+  const enabledServices = useMemo(() => {
+    return services.filter(service => 
+      SERVICE_CONFIG[service.id as keyof typeof SERVICE_CONFIG]
+    );
+  }, []);
 
   useEffect(() => {
   fetchUserActivities();
@@ -130,17 +171,20 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Services Grid */}
+      {/* Services Grid - Only display if enabled in SERVICE_CONFIG */}
       <h2 className="font-serif text-xl font-bold text-foreground mb-4">Your Services</h2>
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {services.map((service) => {
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {useMemo(() => 
+          ALL_SERVICES.filter(service => 
+            SERVICE_CONFIG[service.id as keyof typeof SERVICE_CONFIG]
+          ), []).map((service) => {
           const Icon = service.icon;
           return (
-            <Card key={service.path} className="group hover:shadow-lg transition-shadow">
+            <Card key={service.id} className="group hover:shadow-xl transition-all duration-300 border-border/50">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className={`p-3 rounded-lg ${service.color}`}>
-                    <Icon className="w-6 h-6" />
+                  <div className={`p-4 rounded-xl ${service.color}`}>
+                    <Icon className="w-7 h-7" />
                   </div>
                   <Link to={service.path}>
                     <Button variant="ghost" size="icon" className="group-hover:translate-x-1 transition-transform">
@@ -148,13 +192,15 @@ export default function Dashboard() {
                     </Button>
                   </Link>
                 </div>
-                <CardTitle className="text-lg">{service.title}</CardTitle>
-                <CardDescription>{service.description}</CardDescription>
+                <CardTitle className="text-xl mt-4">{service.title}</CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  {service.description}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <Link to={service.path}>
-                  <Button variant="outline" className="w-full">
-                    Go to {service.title}
+                  <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    Access {service.title}
                   </Button>
                 </Link>
               </CardContent>
@@ -163,34 +209,49 @@ export default function Dashboard() {
         })}
       </div>
 
+      {/* Empty State Fallback */}
+      {useMemo(() => 
+        ALL_SERVICES.filter(service => 
+          SERVICE_CONFIG[service.id as keyof typeof SERVICE_CONFIG]
+        ), []).length === 0 && (
+        <div className="text-center py-20 border-2 border-dashed rounded-3xl mb-8">
+          <p className="text-muted-foreground">No services are currently active for your portal.</p>
+        </div>
+      )}
+
       {/* Recent Activity */}
       <h2 className="font-serif text-xl font-bold text-foreground mb-4">Recent Activity</h2>
       <Card>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-center gap-4 p-4">
-                <div className={`p-2 rounded-full ${
-                  activity.status === 'success' ? 'bg-green-500/10' :
-                  activity.status === 'pending' ? 'bg-yellow-500/10' : 'bg-blue-500/10'
-                }`}>
-                  {activity.status === 'success' ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                  ) : activity.status === 'pending' ? (
-                    <Clock className="w-4 h-4 text-yellow-600" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-blue-600" />
-                  )}
+            {recentActivities && recentActivities.length > 0 ? (
+              recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-center gap-4 p-4">
+                  <div className={`p-2 rounded-full ${
+                    activity.status === 'success' ? 'bg-green-500/10' :
+                    activity.status === 'pending' ? 'bg-yellow-500/10' : 'bg-blue-500/10'
+                  }`}>
+                    {activity.status === 'success' ? (
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    ) : activity.status === 'pending' ? (
+                      <Clock className="w-4 h-4 text-yellow-600" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-blue-600" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground">{activity.message}</p>
+                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{activity.message}</p>
-                  <p className="text-xs text-muted-foreground">{activity.time}</p>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="p-4 text-sm text-muted-foreground">No recent activity to show.</p>
+            )}
           </div>
         </CardContent>
       </Card>
+
     </DashboardLayout>
   );
 }

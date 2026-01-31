@@ -18,7 +18,6 @@ class JobService {
 
     async getAllJobs(): Promise<{ data: Job[] | null; error: JobError | null }> {    
         const result =  authApi.request<Job[]>("/Jobs");
-        console.log("getCurrentUser result", result.then(res => console.log(res.data)));
         return result;
     }
 }

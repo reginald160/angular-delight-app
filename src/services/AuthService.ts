@@ -147,13 +147,11 @@ class AuthApiService {
   async getCurrentUser(email:string): Promise<{ data: LoginUser | null; error: AuthError | null }> {
 
     const result =  this.request<LoginUser>("/auth/me");
-    console.log("getCurrentUser result", result.then(res => console.log(res.data)));
     return result;
   }
    getCurrentUser1(email:string): Promise<{ data: LoginUser | null; error: AuthError | null }> {
 
     const result =  this.request<LoginUser>("/auth/me");
-    console.log("getCurrentUser result", result.then(res => console.log(res.data)));
     return result;
   }
 
@@ -176,7 +174,6 @@ class AuthApiService {
   async getCV(id:string): Promise<{ data: FileUploadDto | null; error: AuthError | null }> {
 
     const result =  this.request<FileUploadDto>("/files/GetCV");
-    console.log("getCV result", result.then(res => console.log(res.data)));
     return result;
   }
 

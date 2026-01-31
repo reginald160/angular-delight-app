@@ -34,8 +34,6 @@ export const NotificationBell = () => {
        //alert(notificationCount.toString())
       
       setUnreadCount(notificationCount);
-
-      console.log("new data", notifications)
       setNotifications(newNotification);
       //fetchNotifications()
       

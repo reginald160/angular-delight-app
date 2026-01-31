@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { 
@@ -14,7 +14,7 @@ import {
   Settings,
   ChevronRight
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { ChatPanel } from '@/components/chat/ChatPanel';
@@ -25,12 +25,20 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
+// 1. STATIC CONFIGURATION: Toggle services here
+const SERVICE_CONFIG = {
+  visa: false,     // Set to false to hide
+  housing: false,
+  jobs: true,
+  driving: false, // Currently disabled globally
+} as const;
+
 const navItems = [
-  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { path: '/dashboard/visa', label: 'Visa Support', icon: FileText },
-  { path: '/dashboard/housing', label: 'Housing', icon: Home },
-  { path: '/dashboard/jobs', label: 'Jobs', icon: Briefcase },
-  { path: '/dashboard/driving', label: 'Driving', icon: Car },
+  { id: 'overview', path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'visa', path: '/dashboard/visa', label: 'Visa Support', icon: FileText },
+  { id: 'housing', path: '/dashboard/housing', label: 'Housing', icon: Home },
+  { id: 'jobs', path: '/dashboard/jobs', label: 'Jobs', icon: Briefcase },
+  { id: 'driving', path: '/dashboard/driving', label: 'Driving', icon: Car },
 ];
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
@@ -38,19 +46,31 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const {connected, notificationCount} = useChat();
+  const { connected, notificationCount } = useChat();
+  const navigate = useNavigate();
+
+  // 2. FILTER LOGIC: Uses the static SERVICE_CONFIG object
+  const visibleNavItems = useMemo(() => {
+    return navItems.filter((item) => {
+      // Always show dashboard
+      if (item.id === 'overview') return true;
+
+      // Check the static config instead of the user object
+      return SERVICE_CONFIG[item.id as keyof typeof SERVICE_CONFIG] === true;
+    });
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
+    navigate("/auth");
   };
 
-  // Helper to get current page title from path
   const currentPathLabel = navItems.find(item => item.path === location.pathname)?.label || 'Overview';
 
   return (
     <div className="min-h-screen bg-muted/30 flex">
       
-      {/* 1. SIDEBAR (Desktop & Mobile) */}
+      {/* SIDEBAR */}
       <aside
         className={cn(
           "fixed top-0 left-0 h-full w-64 bg-background border-r border-border z-50 transition-transform duration-300 lg:translate-x-0",
@@ -58,7 +78,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         )}
       >
         <div className="flex flex-col h-full">
-          {/* Logo Section */}
           <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
             <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-serif font-bold text-lg">UK</span>
@@ -69,9 +88,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
           </div>
 
-          {/* Navigation Links */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (
@@ -93,7 +111,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             })}
           </nav>
 
-          {/* Sidebar Footer (User Controls) */}
           <div className="p-4 border-t border-border space-y-2">
              <div className="flex items-center gap-3 px-2 py-3 mb-2 bg-muted/50 rounded-lg">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -106,22 +123,23 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
              </div>
             
             <Button variant="outline" size="sm" className="w-full justify-start gap-2" onClick={() => setProfileOpen(true)}>
-              <Settings className="w-4 h-4" /> Settings
+              <Settings className="w-4 h-4" /> Profile
             </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4" /> Sign Out
-            </Button>
+             <Button
+                variant="outline"
+                className="w-full justify-start gap-3"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </Button>
           </div>
         </div>
       </aside>
 
-      {/* 2. MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col lg:pl-64">
-        
-        {/* SHARED HEADER (Mobile Menu + Desktop Notifications) */}
         <header className="sticky top-0 h-16 bg-background/80 backdrop-blur-md border-b border-border z-40 flex items-center justify-between px-4 lg:px-8">
           <div className="flex items-center gap-4">
-            {/* Mobile Burger Menu */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
@@ -129,7 +147,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
             
-            {/* Desktop Breadcrumb/Title */}
             <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
               <span>Pages</span>
               <ChevronRight className="w-4 h-4" />
@@ -137,7 +154,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             </div>
           </div>
 
-          {/* The Notification Bell - Now visible on ALL screen sizes */}
           <div className="flex items-center gap-2">
              <NotificationBell />
              <div className="h-6 w-[1px] bg-border mx-2 hidden lg:block" />
@@ -147,7 +163,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
         <main className="p-4 lg:p-8 flex-1">
            <div className="max-w-7xl mx-auto">
               {children}
@@ -155,7 +170,6 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </main>
       </div>
 
-      {/* 3. OVERLAYS & MODALS */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"

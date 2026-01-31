@@ -49,7 +49,7 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
       await connection.start();
       connectionRef.current = connection;
       setConnected(true);
-      console.log('SignalR Global Provider Connected');
+      //console.log('SignalR Global Provider Connected');
     } catch (err) {
       console.error('SignalR Connection Failed:', err);
     }
