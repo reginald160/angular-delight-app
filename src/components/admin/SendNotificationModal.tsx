@@ -10,7 +10,7 @@ import { Loader2, Bell } from 'lucide-react';
 interface SendNotificationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  users: { user_id: string; first_name: string | null; last_name: string | null }[];
+  users: { id: string; first_name: string | null; last_name: string | null }[];
   onSend: (userId: string | 'all', title: string, message: string, type: string) => Promise<void>;
 }
 
@@ -57,10 +57,10 @@ export const SendNotificationModal = ({ open, onOpenChange, users, onSend }: Sen
               <SelectContent>
                 <SelectItem value="all">All Users</SelectItem>
                 {users.map((user) => (
-                  <SelectItem key={user.user_id} value={user.user_id}>
+                  <SelectItem key={user.id} value={user.id}>
                     {user.first_name || user.last_name 
                       ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
-                      : `User ${user.user_id.slice(0, 8)}...`}
+                      : `User ${user.id.slice(0, 8)}...`}
                   </SelectItem>
                 ))}
               </SelectContent>

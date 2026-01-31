@@ -12,14 +12,9 @@ import { MessageSquare, Send, Loader2, User } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { LoginUser } from '@/services/AuthService';
 
 export default function AdminChats() {
-
-    const localUser = localStorage.getItem("authUser");
-     const currentUser = JSON.parse(localUser) as LoginUser;
-
-  const [user, setUser] = useState<LoginUser>(currentUser)
+  const { user } = useAuth();
   const { conversations, messages, currentConversation, selectConversation, sendMessage, loading } = useChat();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [input, setInput] = useState('');
@@ -32,14 +27,13 @@ export default function AdminChats() {
         setIsAdmin(false);
         return;
       }
-     if(user.role === "Admin")
-     {
-       setIsAdmin(true);
-
-     }
-     else{
-      setIsAdmin(false)
-     }
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      setIsAdmin(!!data);
     };
     checkAdmin();
   }, [user]);
@@ -65,7 +59,6 @@ export default function AdminChats() {
   const handleSend = async () => {
     if (!input.trim() || sending || !currentConversation) return;
     
- 
     setSending(true);
     await sendMessage(input.trim(), currentConversation.id);
     setInput('');
@@ -78,7 +71,6 @@ export default function AdminChats() {
       handleSend();
     }
   };
-
 
   return (
     <AdminLayout>

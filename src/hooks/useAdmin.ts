@@ -3,7 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Job } from '@/hooks/useJobs';
-
+import { LoginUser } from '@/services/AuthService';
+import { authApi } from '@/services/AuthService';
+import {CreateNotificationRequest, notificationService} from '@/services/NotificationService'
+import {jobService} from '@/services/jobService'
 interface UserProfile {
   id: string;
   user_id: string;
@@ -12,6 +15,7 @@ interface UserProfile {
   email?: string;
   phone: string | null;
   created_at: string;
+  is_locked : boolean
 }
 
 export const useAdmin = () => {
@@ -23,50 +27,60 @@ export const useAdmin = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
 
   const checkAdminRole = async () => {
-    if (!user) {
+  
+    try {
+
+     const authUser = localStorage.getItem("authUser");
+     const currentUser = JSON.parse(authUser) as LoginUser;
+    if (!currentUser) {
       setIsAdmin(false);
       setLoading(false);
       return;
     }
-
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      if (error) throw error;
-      setIsAdmin(!!data);
+    if(currentUser.role === "Admin")
+    {
+      setIsAdmin(true);
+         setLoading(false);
+    }
+    else{
+          setIsAdmin(false);
+          setLoading(false);
+    }
+   
     } catch (error) {
       console.error('Error checking admin role:', error);
       setIsAdmin(false);
     } finally {
       setLoading(false);
     }
+
   };
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await authApi.getUsers();
 
       if (error) throw error;
-      setUsers(data || []);
+      setUsers( (data || []) as unknown as UserProfile []);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+    const handleLock = async ( userId: string) => {
+    try {
+      const { data, error } = await authApi.lockUp(userId);
+      // if (error) throw error;
+      // setUsers( (data || []) as unknown as UserProfile []);
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
 
   const fetchJobs = async () => {
+    
     try {
-      const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await  jobService.getAllJobs();
 
       if (error) throw error;
       setJobs((data || []) as Job[]);
@@ -161,41 +175,27 @@ export const useAdmin = () => {
     type: string = 'info'
   ) => {
     if (!user) return;
-
-    try {
-      if (userId === 'all') {
-        // Send to all users
-        const { data: allUsers } = await supabase
-          .from('profiles')
-          .select('user_id');
-
-        if (allUsers) {
-          const notifications = allUsers.map(u => ({
-            user_id: u.user_id,
-            title,
-            message,
-            type,
-            created_by: user.id
-          }));
-
-          const { error } = await supabase
-            .from('notifications')
-            .insert(notifications);
-
-          if (error) throw error;
-        }
-      } else {
-        const { error } = await supabase
-          .from('notifications')
-          .insert({
+  const newNotification : CreateNotificationRequest =  {
             user_id: userId,
             title,
             message,
-            type,
-            created_by: user.id
-          });
+            type
 
-        if (error) throw error;
+          }
+    try {
+      if (userId === 'all') {
+        // Send to all users
+        // const { data: allUsers } = await authApi.getUsers()
+         newNotification.user_id = "3fa85f64-5717-4562-b3fc-2c963f66afa6";
+        const{error} = await notificationService.SendNotificationToAllAsync(newNotification);
+             
+          if (error) throw error;
+
+
+      } else {
+       
+        const { error } = await  notificationService.SendNotificationAsync(newNotification)
+              if (error) throw error;
       }
 
       toast({
@@ -231,6 +231,7 @@ export const useAdmin = () => {
     createJob,
     updateJob,
     deleteJob,
+    handleLock,
     sendNotification,
     refreshUsers: fetchUsers,
     refreshJobs: fetchJobs

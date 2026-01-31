@@ -11,6 +11,10 @@ export interface ServiceModule {
 }
 
 export interface UserProfile {
+  is_locked: any;
+  subscription_type: string;
+  last_name: ReactNode;
+  first_name: ReactNode;
   id: string;
   name: string;
   email: string;

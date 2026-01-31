@@ -21,6 +21,9 @@ import AdminJobs from "./pages/admin/AdminJobs";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminChats from "./pages/admin/AdminChats";
+import EmailConfirmation from "./pages/EmailConfirmation";
+import SignupSuccess from "./pages/SignupSuccess";
+import { PricingSection } from "./pages/PricingSection";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +37,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+               <Route path="/Confirm" element={<EmailConfirmation />} />
+            <Route path="/signup-success" element={<SignupSuccess />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
@@ -41,11 +46,13 @@ const App = () => (
             <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} />
             <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} />
             <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} />
+            <Route path="/price" element={<AuthGuard><PricingSection /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/jobs" element={<AuthGuard><AdminJobs /></AuthGuard>} />
             <Route path="/admin/users" element={<AuthGuard><AdminUsers /></AuthGuard>} />
             <Route path="/admin/notifications" element={<AuthGuard><AdminNotifications /></AuthGuard>} />
             <Route path="/admin/chats" element={<AuthGuard><AdminChats /></AuthGuard>} />
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { authApi } from '@/services/AuthService';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -35,8 +36,8 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
+   await signOut();
+      navigate("/auth")
   };
 
   return (
