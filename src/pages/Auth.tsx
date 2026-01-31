@@ -92,7 +92,7 @@ export default function Auth() {
     toast.success('Welcome back!');
   
     const loginUser = await authApi.getCurrentAuthUser();
-    const role = loginUser.Role;
+    const role = loginUser.role;
     if(role === 'Admin'){
       navigate('/admin');
     }
@@ -141,7 +141,7 @@ export default function Auth() {
     }
 
     toast.success('Account created successfully! Welcome to UK Pathway.');
-    navigate('/');
+    navigate('/signup-success');
   };
 
   const handleGoogleSignIn = async () => {

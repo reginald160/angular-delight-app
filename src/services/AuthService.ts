@@ -11,6 +11,12 @@ export interface AuthUser {
   email: string;
 }
 
+export interface RecentActivity {
+  type: string;
+  message: string;
+  time: string;
+  status: string;
+}
 export interface UsersResponse {
   last_name: string;
   first_name: string;
@@ -46,15 +52,15 @@ class AuthApiService {
     options: RequestInit = {}
   ): Promise<{ data: T | null; error: AuthError | null }> {
     try {
-        
+      const reactBaseUrl = window.location.origin;
       const token = localStorage.getItem("accessToken");
-
-
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         // credentials: 'include', // Include cookies for session management
         headers: {
           'Content-Type': 'application/json',
+          'X-Client-Base-Url': reactBaseUrl,
+          'X-Client-Endpoint': "reset-password",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...options.headers,
         },
@@ -91,28 +97,26 @@ class AuthApiService {
     });
   }
 
-
    deleteCVFile(): Promise<{ data: null; error: AuthError | null }> {
     return this.request<null>(`/files/DeleteCV`, {
       method: 'DELETE',
     });
   }
-   async ConfirmEmail(email: string, token: string): Promise<{ data: AuthResponse | null; error: AuthError | null }> {
+  async ConfirmEmail(email: string, token: string): Promise<{ data: AuthResponse | null; error: AuthError | null }> {
     const url = `/auth/confirm-email?userId=${email}&token=${encodeURIComponent(token)}`;
     return this.request<AuthResponse>( url, {
       method: 'GET',
     });
   }
-
   async register(
     email: string,
     password: string,
     firstName?: string,
     lastName?: string
   ): Promise<{ data: AuthResponse | null; error: AuthError | null }> {
-    return this.request<AuthResponse>('/auth/register', {
+    return this.request<AuthResponse>('/auth/signup', {
       method: 'POST',
-      body: JSON.stringify({ email, password, firstName, lastName }),
+      body: JSON.stringify({ email: email, password : password, firstName: firstName, lastName: lastName }),
     });
   }
 
@@ -128,7 +132,6 @@ class AuthApiService {
       localStorage.removeItem("authUser");
     return { error: null };
   }
-
 
   async UpdateProfile(
     firstName : string,
@@ -159,6 +162,10 @@ class AuthApiService {
     return result;
   }
 
+  getUserActivities(): Promise<{ data: RecentActivity []| null; error: AuthError | null }> {
+    const result =  this.request<RecentActivity []>("/auth/Activities");
+    return result;
+  }
 
     lockUp(userId : string): Promise<{ data: UserProfile []| null; error: AuthError | null }> {
     const result =  this.request<UserProfile []>("/auth/" + userId + "/toggle-lock", {

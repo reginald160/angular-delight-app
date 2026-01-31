@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import {authApi, AuthUser} from "@/services/AuthService";
+import {authApi, AuthUser, RecentActivity} from "@/services/AuthService";
 import { useToast } from '@/hooks/use-toast';
 import { AlarmClock } from 'lucide-react';
 
@@ -21,7 +21,21 @@ export const useProfile = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [recentActivities, setUserActivities] = useState<RecentActivity[] | null>([]);
 
+  const fetchUserActivities = async ()=> {
+    
+    try {
+      const { data, error } = await  authApi.getUserActivities();
+      if (error) throw error;
+      setUserActivities(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    } finally {
+      setLoading(false);
+    }
+
+  }
   const fetchProfile = async () => {
 
     if (!user) {
@@ -93,6 +107,8 @@ export const useProfile = () => {
   return {
     profile,
     loading,
+    fetchUserActivities,
+    recentActivities,
     updateProfile,
     refresh: fetchProfile
   };

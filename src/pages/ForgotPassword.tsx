@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-const API_BASE_URL = 'http://localhost:8082/api/v1';
+const API_BASE_URL =  import.meta.env.VITE_API_BASE_URL || '';
 
 const forgotPasswordSchema = z.object({
   email: z.string().trim().email({ message: 'Please enter a valid email address' }),
@@ -35,32 +35,40 @@ export default function ForgotPassword() {
     },
   });
 
-  const handleSubmit = async (data: ForgotPasswordFormData) => {
-    setIsSubmitting(true);
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email }),
-      });
+const handleSubmit = async (data: ForgotPasswordFormData) => {
+  setIsSubmitting(true);
 
-      const result = await response.json().catch(() => null);
-      
-      setIsSubmitting(false);
+  const reactBaseUrl = window.location.origin;
+  const endpoint = '/auth/forgot-password';
 
-      if (!response.ok) {
-        toast.error(result?.message || 'Failed to send reset email');
-        return;
-      }
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Client-Base-Url': reactBaseUrl,
+        'X-Client-Endpoint': "reset-password",
+      },
+      body: JSON.stringify({ email: data.email }),
+    });
 
-      setEmailSent(true);
-      toast.success('Password reset email sent!');
-    } catch {
-      setIsSubmitting(false);
-      toast.error('Network error. Please try again.');
+    const result = await response.json().catch(() => null);
+
+    setIsSubmitting(false);
+
+    if (!response.ok) {
+      toast.error(result?.message || 'Failed to send reset email');
+      return;
     }
-  };
+
+    setEmailSent(true);
+    toast.success('Password reset email sent!');
+  } catch {
+    setIsSubmitting(false);
+    toast.error('Network error. Please try again.');
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-background flex">

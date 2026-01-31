@@ -4,6 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { FileText, Home, Briefcase, Car, ArrowRight, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { authApi } from '@/services/AuthService';
+import { useProfile } from '@/hooks/useProfile';
+import { useEffect } from 'react';
+
 
 const services = [
   {
@@ -40,6 +44,7 @@ const services = [
   },
 ];
 
+
 const recentActivity = [
   { type: 'visa', message: 'Visa application status updated', time: '2 hours ago', status: 'success' },
   { type: 'job', message: 'New job match found', time: '5 hours ago', status: 'info' },
@@ -50,6 +55,12 @@ const recentActivity = [
 export default function Dashboard() {
   const { user } = useAuth();
   const firstName = user?.firstName;   // User metadata not available from custom API
+  const {fetchUserActivities, recentActivities} = useProfile()
+
+  useEffect(() => {
+  fetchUserActivities();
+}, []);
+
 
   return (
     <DashboardLayout>
@@ -157,7 +168,7 @@ export default function Dashboard() {
       <Card>
         <CardContent className="p-0">
           <div className="divide-y divide-border">
-            {recentActivity.map((activity, index) => (
+            {recentActivities.map((activity, index) => (
               <div key={index} className="flex items-center gap-4 p-4">
                 <div className={`p-2 rounded-full ${
                   activity.status === 'success' ? 'bg-green-500/10' :
