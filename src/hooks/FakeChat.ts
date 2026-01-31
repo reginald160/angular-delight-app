@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import {chatService} from '@/services/ChatService';
 import {v4 as uuidv4} from 'uuid'
 import { notificationService } from '@/services/NotificationService';
-import { NotificationModel, useNotifications } from './useNotifications';
+import { useSignalR } from './SignalRContext';
 
 export interface ChatMessage {
   id: string;
@@ -46,14 +46,12 @@ export const useChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [unreadCount, setUnreadCount] = useState(0);
   const [connected, setConnected] = useState(false);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [newNotification, setNewNotification] = useState<NotificationModel[]>([]);
   const [notificationCount, setNotificationCount] = useState(0);
-   const {setNotifications, unreadCount, setUnreadCount, fetchNotifications} = useNotifications();
-  
+  // const { connection, connected, notificationCount, isChatOpen, setIsChatOpen } = useSignalR();
 
 
 
@@ -73,7 +71,7 @@ export const useChat = () => {
 
       const connection = new signalR.HubConnectionBuilder()
               .withUrl(SIGNALR_HUB_URL, {
-                  skipNegotiation: true,  // skipNegotiation as we specify WebSockets
+                 skipNegotiation: true,  // skipNegotiation as we specify WebSockets
                  transport: signalR.HttpTransportType.WebSockets,  // force WebSocket transport
                 accessTokenFactory: async () => {
                   const token = localStorage.getItem("accessToken");
@@ -105,35 +103,30 @@ export const useChat = () => {
         }
       });
 
-  
      connection.on('ReceiveNotification', async (notification: string) => {
   try {
-  
-
-
+        // 1. Update the Count immediately for UI responsiveness
+        // setNotificationCount(prev => prev + 1);
+       alert(notification);
+        // 2. Refresh the list from the service
         const { data: notif, error: notiError } = await notificationService.GetUserNotificationsAsync(user.id);
 
         if (notiError) throw notiError;
 
         // 3. Format and Update State
-        const formattedNotifications = notif as NotificationModel[];
-        // setNotifications(for);
+        const formattedNotifications = (notif as Notification[]) || [];
+        //setNotifications(formattedNotifications);
         
+        // 4. Update the unread badge based on the fresh data
         const unread = formattedNotifications.filter(n => !n.is_read).length;
-        setNotificationCount(unread,);
-        setUnreadCount(unread)
-        // setUnreadCount(unread);
-        setNewNotification(formattedNotifications);
-       
-        const originalTitle = document.title;
-        document.title = "🔔 New Notification!";
+        setNotificationCount(unread);
+        setUnreadCount(unread);
 
-        // Revert after 3 seconds
-        setTimeout(() => {
-          document.title = originalTitle;
-        }, 3000);
         // 5. Alert the user
-     
+        toast({
+          title: notification.title || 'New Notification',
+          description: notification.message,
+        });
       } catch (err) {
         console.error("Error updating notifications after SignalR signal:", err);
       }
@@ -183,7 +176,7 @@ export const useChat = () => {
       console.error('Failed to connect to SignalR chat hub:', error);
       // Fallback: connection failed, we'll rely on polling or Supabase realtime
     }
-  }, [user, toast, currentConversation, isChatOpen]);
+  }, [user, toast, currentConversation, isChatOpen, connection]);
 
 
   // Cleanup connection on unmount
@@ -435,8 +428,6 @@ export const useChat = () => {
     unreadCount,
     connected,
     notificationCount,
-    newNotification,
-    setNewNotification,
     createConversation,
     sendMessage,
     selectConversation,

@@ -49,14 +49,13 @@ export function Footer() {
               The unified digital ecosystem simplifying migration, employment, and settlement in the United Kingdom.
             </p>
             <div className="flex flex-col gap-3 text-sm text-primary-foreground/80">
-              <a href="mailto:hello@ukpathway.com" className="flex items-center gap-2 hover:text-primary-foreground transition-colors">
+              <a href="mailto:support@pathway-hub.com" className="flex items-center gap-2 hover:text-primary-foreground transition-colors">
                 <Mail className="w-4 h-4" />
                 hello@ukpathway.com
               </a>
               <a href="tel:+442012345678" className="flex items-center gap-2 hover:text-primary-foreground transition-colors">
                 <Phone className="w-4 h-4" />
-                +44 20 1234 5678
-              </a>
+                +44 7919 785 936              </a>
               <span className="flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 London, United Kingdom

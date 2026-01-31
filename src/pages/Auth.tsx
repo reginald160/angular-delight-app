@@ -90,9 +90,9 @@ export default function Auth() {
       return;
     }
     toast.success('Welcome back!');
-  
+
     const loginUser = await authApi.getCurrentAuthUser();
-    const role = loginUser.Role;
+    const role = loginUser.role;
     if(role === 'Admin'){
       navigate('/admin');
     }
@@ -100,9 +100,9 @@ export default function Auth() {
       navigate('/dashboard');
     };
 
-  
-   
-  
+
+
+
   };
 
   const CheckRole = async () => {
@@ -141,7 +141,7 @@ export default function Auth() {
     }
 
     toast.success('Account created successfully! Welcome to UK Pathway.');
-    navigate('/');
+    navigate('/signup-success');
   };
 
   const handleGoogleSignIn = async () => {
@@ -159,20 +159,20 @@ export default function Auth() {
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-hero relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%220.05%22%3E%3Cpath%20d%3D%22M36%2034v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6%2034v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6%204V0H4v4H0v2h4v4h2V6h4V4H6z%22%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-50"></div>
-        
+
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-center">
           <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-8 border border-white/20">
             <span className="text-white font-serif font-bold text-3xl">UK</span>
           </div>
-          
+
           <h1 className="font-serif text-4xl font-bold text-white mb-4">
             UK Pathway Hub
           </h1>
           <p className="text-white/80 text-lg max-w-md mb-8">
-            Your comprehensive platform for navigating life in the United Kingdom. 
+            Your comprehensive platform for navigating life in the United Kingdom.
             From visas to housing, we've got you covered.
           </p>
-          
+
           <div className="grid grid-cols-2 gap-4 max-w-sm">
             {[
               { icon: '🛂', label: 'Visa Support' },
@@ -193,8 +193,8 @@ export default function Auth() {
       <div className="flex-1 flex flex-col justify-center items-center p-8 lg:p-12">
         <div className="w-full max-w-md">
           {/* Back to Home */}
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -218,8 +218,8 @@ export default function Auth() {
               {isLogin ? 'Welcome Back' : 'Create Account'}
             </h2>
             <p className="text-muted-foreground">
-              {isLogin 
-                ? 'Sign in to continue your UK journey' 
+              {isLogin
+                ? 'Sign in to continue your UK journey'
                 : 'Join thousands navigating their UK pathway'}
             </p>
           </div>
@@ -280,17 +280,17 @@ export default function Auth() {
                 />
 
                 <div className="flex justify-end">
-                  <Link 
-                    to="/forgot-password" 
+                  <Link
+                    to="/forgot-password"
                     className="text-sm text-primary hover:text-primary/80 transition-colors"
                   >
                     Forgot password?
                   </Link>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  variant="royal" 
+                <Button
+                  type="submit"
+                  variant="royal"
                   className="w-full h-12 text-base"
                   disabled={isSubmitting}
                 >
@@ -304,7 +304,7 @@ export default function Auth() {
                   )}
                 </Button>
 
-                {/* Divider */}
+                {/* Divider
                 <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-border" />
@@ -315,7 +315,7 @@ export default function Auth() {
                 </div>
 
                 {/* Google Sign In */}
-                <Button
+                {/* <Button
                   type="button"
                   variant="outline"
                   className="w-full h-12 text-base"
@@ -345,7 +345,7 @@ export default function Auth() {
                     </svg>
                   )}
                   Continue with Google
-                </Button>
+                </Button> */}
               </form>
             </Form>
           ) : (
@@ -474,9 +474,9 @@ export default function Auth() {
                   )}
                 />
 
-                <Button 
-                  type="submit" 
-                  variant="royal" 
+                <Button
+                  type="submit"
+                  variant="royal"
                   className="w-full h-12 text-base"
                   disabled={isSubmitting}
                 >
@@ -491,7 +491,7 @@ export default function Auth() {
                 </Button>
 
                 {/* Divider */}
-                <div className="relative my-6">
+                {/* <div className="relative my-6">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-border" />
                   </div>
@@ -500,7 +500,7 @@ export default function Auth() {
                   </div>
                 </div>
 
-                {/* Google Sign Up */}
+             
                 <Button
                   type="button"
                   variant="outline"
@@ -531,7 +531,7 @@ export default function Auth() {
                     </svg>
                   )}
                   Continue with Google
-                </Button>
+                </Button> */}
               </form>
             </Form>
           )}

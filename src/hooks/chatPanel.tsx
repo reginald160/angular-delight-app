@@ -16,7 +16,7 @@ export const ChatPanel = () => {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [isOpen, setIsOpen] = useState(false);
+
 
   const handleOpen = async () => {
     setIsOpen(true);

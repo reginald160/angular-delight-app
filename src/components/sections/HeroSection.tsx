@@ -1,5 +1,5 @@
 import { ArrowRight, CheckCircle, Shield, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, LinkButton } from '@/components/ui/button';
 
 const highlights = [
   'Visa & Immigration Support',
@@ -55,13 +55,18 @@ export function HeroSection() {
 
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-in [animation-delay:400ms] opacity-0">
-              <Button variant="hero" size="xl" className="group">
-                Start Your Journey
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <Button variant="heroOutline" size="xl">
+             <LinkButton 
+                  to="/dashboard" 
+                  variant="hero" 
+                  size="xl" 
+                  className="group"
+                >
+                  Start Your Journey
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </LinkButton>
+              {/* <LinkButton to ="/#services" variant="heroOutline"   className="group" size="xl">
                 Explore Services
-              </Button>
+              </LinkButton> */}
             </div>
 
             {/* Trust Indicators */}

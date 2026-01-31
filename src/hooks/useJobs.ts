@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { authApi, AuthUser } from "@/services/AuthService";
+import { jobService } from '@/services/jobService';
 
 export interface Job {
   id: string;
@@ -95,11 +96,8 @@ export function useJobs() {
 
   // Fetch all jobs
   const fetchJobs = async () => {
-    const { data, error } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('is_active', true)
-      .order('posted_at', { ascending: false });
+    
+    const { data, error } = await jobService.getAllJobs();
 
     if (error) {
       console.error('Error fetching jobs:', error);

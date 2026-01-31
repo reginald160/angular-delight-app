@@ -39,8 +39,7 @@ export function CTASection() {
               className="flex items-center gap-2 hover:text-primary-foreground transition-colors"
             >
               <Phone className="w-5 h-5" />
-              +44 20 1234 5678
-            </a>
+              +44 7919 785 936            </a>
             <span className="hidden sm:block text-primary-foreground/40">|</span>
             <p>Available Mon-Fri, 9am-6pm GMT</p>
           </div>

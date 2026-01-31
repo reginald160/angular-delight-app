@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
-const API_BASE_URL = 'http://localhost:8082/api/v1';
+ const API_BASE_URL =  import.meta.env.VITE_API_BASE_URL || '';
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
@@ -36,6 +36,7 @@ export default function ResetPassword() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const userId = searchParams.get('userId')
   const navigate = useNavigate();
 
   const form = useForm<ResetPasswordFormData>({
@@ -54,8 +55,9 @@ export default function ResetPassword() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          token,
-          password: data.password,
+          token: token,
+          userId: userId,
+          newPassword: data.password,
         }),
       });
 
