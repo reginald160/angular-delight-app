@@ -24,6 +24,9 @@ import AdminChats from "./pages/admin/AdminChats";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import SignupSuccess from "./pages/SignupSuccess";
 import { PricingSection } from "./pages/PricingSection";
+import ProfileCompletion from "./pages/complete-profile";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCanceled from "./pages/PaymentCanceled";
 
 const queryClient = new QueryClient();
 
@@ -42,10 +45,14 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+            <Route path="/dashboard/profile" element={<AuthGuard><ProfileCompletion /></AuthGuard>} />
+            {/* <Route path="/dashboard/pricing" element={<AuthGuard><PricingSection /></AuthGuard>} /> */}
             <Route path="/dashboard/visa" element={<AuthGuard><VisaDashboard /></AuthGuard>} />
             <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} />
             <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} />
             <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} />
+            <Route path="/payment-success" element={<AuthGuard><PaymentSuccess /></AuthGuard>} />
+            <Route path="/payment-canceled" element={<AuthGuard><PaymentCanceled /></AuthGuard>} />
             <Route path="/price" element={<AuthGuard><PricingSection /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/jobs" element={<AuthGuard><AdminJobs /></AuthGuard>} />

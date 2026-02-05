@@ -124,7 +124,7 @@ export default function Dashboard() {
                 <CheckCircle className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">12</p>
+                <p className="text-2xl font-bold text-foreground">0</p>
                 <p className="text-xs text-muted-foreground">Completed</p>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function Dashboard() {
                 <Clock className="w-5 h-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">5</p>
+                <p className="text-2xl font-bold text-foreground">0</p>
                 <p className="text-xs text-muted-foreground">In Progress</p>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function Dashboard() {
                 <FileText className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">3</p>
+                <p className="text-2xl font-bold text-foreground">0</p>
                 <p className="text-xs text-muted-foreground">Applications</p>
               </div>
             </div>
@@ -163,7 +163,7 @@ export default function Dashboard() {
                 <AlertCircle className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">1</p>
+                <p className="text-2xl font-bold text-foreground">0</p>
                 <p className="text-xs text-muted-foreground">Action Needed</p>
               </div>
             </div>
