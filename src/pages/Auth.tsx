@@ -140,8 +140,8 @@ export default function Auth() {
       return;
     }
 
-    toast.success('Account created successfully! Welcome to UK Pathway.');
-    navigate('/signup-success');
+    toast.success('Account created! Please verify your email.');
+    navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`);
   };
 
   const handleGoogleSignIn = async () => {
