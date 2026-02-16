@@ -256,8 +256,11 @@ export type Database = {
           created_at: string
           first_name: string | null
           id: string
+          industry: string | null
+          job_preferences: Json | null
           last_name: string | null
           phone: string | null
+          profile_completed: boolean | null
           updated_at: string
           user_id: string
         }
@@ -266,8 +269,11 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          industry?: string | null
+          job_preferences?: Json | null
           last_name?: string | null
           phone?: string | null
+          profile_completed?: boolean | null
           updated_at?: string
           user_id: string
         }
@@ -276,8 +282,11 @@ export type Database = {
           created_at?: string
           first_name?: string | null
           id?: string
+          industry?: string | null
+          job_preferences?: Json | null
           last_name?: string | null
           phone?: string | null
+          profile_completed?: boolean | null
           updated_at?: string
           user_id?: string
         }
@@ -365,6 +374,48 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          product_id: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          product_id?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          product_id?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
