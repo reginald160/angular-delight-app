@@ -23,6 +23,7 @@ import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminChats from "./pages/admin/AdminChats";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import SignupSuccess from "./pages/SignupSuccess";
+import VerifyOtp from "./pages/VerifyOtp";
 import { PricingSection } from "./pages/PricingSection";
 
 const queryClient = new QueryClient();
@@ -38,7 +39,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
                <Route path="/Confirm" element={<EmailConfirmation />} />
-            <Route path="/signup-success" element={<SignupSuccess />} />
+             <Route path="/signup-success" element={<SignupSuccess />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
