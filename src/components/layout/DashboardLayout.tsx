@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { ChatPanel } from '@/components/chat/ChatPanel';
 import { ProfileModal } from '@/components/profile/ProfileModal';
+import { ProfileReminder } from '@/components/profile/ProfileReminder';
 import { useChat } from '@/hooks/useChat';
 
 interface DashboardLayoutProps {
@@ -164,6 +165,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       )}
       <ChatPanel />
       <ProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
+      <ProfileReminder />
     </div>
   );
 };
