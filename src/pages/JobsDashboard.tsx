@@ -2,51 +2,43 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Briefcase, 
-  Search, 
-  Filter, 
-  MapPin, 
-  Building, 
-  Clock,
-  PoundSterling,
-  BookmarkPlus,
-  Bookmark,
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Briefcase,
   Send,
   FileText,
   TrendingUp,
-  Loader2
+  Loader2,
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Building,
+  MapPin,
+  Eye,
+  BarChart3,
+  Users,
+  ThumbsUp,
+  AlertCircle
 } from 'lucide-react';
 import { useState } from 'react';
 import { useJobs, Job } from '@/hooks/useJobs';
 import { JobDetailsModal } from '@/components/jobs/JobDetailsModal';
 import { CVUploadModal } from '@/components/jobs/CVUploadModal';
-import { JobAlertModal } from '@/components/jobs/JobAlertModal';
 import { ProfileImproveModal } from '@/components/jobs/ProfileImproveModal';
-import { FilterSheet } from '@/components/jobs/FilterSheet';
 
 export default function JobsDashboard() {
   const {
-    jobs,
     allJobs,
     applications,
     savedJobs,
-    alerts,
     userCV,
     loading,
     stats,
-    searchQuery,
-    setSearchQuery,
-    locationQuery,
-    setLocationQuery,
-    jobTypeFilter,
-    setJobTypeFilter,
     applyForJob,
     toggleSaveJob,
-    createAlert,
-    deleteAlert,
     refreshCV,
     isJobSaved,
     hasApplied
@@ -55,16 +47,25 @@ export default function JobsDashboard() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [jobModalOpen, setJobModalOpen] = useState(false);
   const [cvModalOpen, setCvModalOpen] = useState(false);
-  const [alertModalOpen, setAlertModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [activityTab, setActivityTab] = useState('all');
 
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'interview': return 'bg-green-600';
-      case 'applied': return 'bg-blue-600';
-      case 'reviewing': return 'bg-yellow-600';
-      default: return 'bg-gray-600';
+      case 'interview':
+        return <Badge className="bg-emerald-600 hover:bg-emerald-700 gap-1"><Calendar className="w-3 h-3" /> Interview</Badge>;
+      case 'applied':
+        return <Badge className="bg-blue-600 hover:bg-blue-700 gap-1"><Send className="w-3 h-3" /> Applied</Badge>;
+      case 'reviewing':
+        return <Badge className="bg-amber-600 hover:bg-amber-700 gap-1"><Eye className="w-3 h-3" /> Reviewing</Badge>;
+      case 'offered':
+        return <Badge className="bg-violet-600 hover:bg-violet-700 gap-1"><ThumbsUp className="w-3 h-3" /> Offered</Badge>;
+      case 'rejected':
+        return <Badge className="bg-red-600 hover:bg-red-700 gap-1"><XCircle className="w-3 h-3" /> Rejected</Badge>;
+      case 'accepted':
+        return <Badge className="bg-green-600 hover:bg-green-700 gap-1"><CheckCircle2 className="w-3 h-3" /> Accepted</Badge>;
+      default:
+        return <Badge variant="secondary" className="gap-1"><Clock className="w-3 h-3" /> {status}</Badge>;
     }
   };
 
@@ -75,9 +76,28 @@ export default function JobsDashboard() {
 
   const formatSalary = (min: number | null, max: number | null) => {
     if (!min && !max) return 'Competitive';
-    if (min && max) return `£${(min/1000).toFixed(0)}k - £${(max/1000).toFixed(0)}k`;
-    return min ? `From £${(min/1000).toFixed(0)}k` : `Up to £${(max!/1000).toFixed(0)}k`;
+    if (min && max) return `£${(min / 1000).toFixed(0)}k - £${(max / 1000).toFixed(0)}k`;
+    return min ? `From £${(min / 1000).toFixed(0)}k` : `Up to £${(max! / 1000).toFixed(0)}k`;
   };
+
+  // Derive interview-specific data
+  const interviews = applications.filter(a => a.status === 'interview');
+  const reviewing = applications.filter(a => a.status === 'reviewing');
+  const offered = applications.filter(a => a.status === 'offered');
+  const rejected = applications.filter(a => a.status === 'rejected');
+
+  const filteredApplications = activityTab === 'all'
+    ? applications
+    : applications.filter(a => a.status === activityTab);
+
+  // Stats calculations
+  const totalApplications = applications.length;
+  const interviewRate = totalApplications > 0
+    ? Math.round((interviews.length / totalApplications) * 100)
+    : 0;
+  const successRate = totalApplications > 0
+    ? Math.round((offered.length / totalApplications) * 100)
+    : 0;
 
   const profileStats = userCV?.analysis_result ? [
     { label: 'Profile Completion', value: userCV.analysis_result.profileCompletion },
@@ -103,199 +123,230 @@ export default function JobsDashboard() {
     <DashboardLayout>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold text-foreground mb-2">Jobs 💼</h1>
-        <p className="text-muted-foreground">Discover career opportunities across the United Kingdom</p>
+        <h1 className="font-serif text-3xl font-bold text-foreground mb-2">Job Activity 💼</h1>
+        <p className="text-muted-foreground">Track your applications, interviews, and career progress</p>
       </div>
 
-      {/* Search Bar */}
-      <Card className="mb-8">
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input 
-                placeholder="Job title, skills, or company..." 
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="relative flex-1">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input 
-                placeholder="City or postcode..." 
-                className="pl-10"
-                value={locationQuery}
-                onChange={(e) => setLocationQuery(e.target.value)}
-              />
-            </div>
-            <Button variant="outline" className="gap-2" onClick={() => setFilterOpen(true)}>
-              <Filter className="w-4 h-4" />
-              Filters
-              {jobTypeFilter && <Badge variant="secondary" className="ml-1">1</Badge>}
-            </Button>
-            <Button variant="royal">Search Jobs</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-blue-500/10">
               <Send className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.applied}</p>
-              <p className="text-xs text-muted-foreground">Applied</p>
+              <p className="text-2xl font-bold">{totalApplications}</p>
+              <p className="text-xs text-muted-foreground">Total Applied</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-500/10">
-              <Briefcase className="w-5 h-5 text-green-600" />
+            <div className="p-2 rounded-lg bg-emerald-500/10">
+              <Calendar className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.interviews}</p>
+              <p className="text-2xl font-bold">{interviews.length}</p>
               <p className="text-xs text-muted-foreground">Interviews</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-500/10">
-              <BookmarkPlus className="w-5 h-5 text-purple-600" />
+            <div className="p-2 rounded-lg bg-violet-500/10">
+              <ThumbsUp className="w-5 h-5 text-violet-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.saved}</p>
-              <p className="text-xs text-muted-foreground">Saved</p>
+              <p className="text-2xl font-bold">{offered.length}</p>
+              <p className="text-xs text-muted-foreground">Offers</p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-orange-500/10">
-              <TrendingUp className="w-5 h-5 text-orange-600" />
+            <div className="p-2 rounded-lg bg-amber-500/10">
+              <BarChart3 className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{stats.views}</p>
-              <p className="text-xs text-muted-foreground">Views</p>
+              <p className="text-2xl font-bold">{interviewRate}%</p>
+              <p className="text-xs text-muted-foreground">Interview Rate</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-green-500/10">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{successRate}%</p>
+              <p className="text-xs text-muted-foreground">Success Rate</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Applications & Jobs */}
+        {/* Main Activity Area */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Your Applications */}
-          {applications.length > 0 && (
-            <>
-              <div className="flex items-center justify-between">
-                <h2 className="font-serif text-xl font-bold">Your Applications</h2>
-              </div>
-              <div className="space-y-4">
-                {applications.slice(0, 3).map((app) => (
-                  <Card key={app.id}>
-                    <CardContent className="p-4">
-                      <div className="flex flex-col md:flex-row md:items-center gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h3 className="font-semibold text-foreground">{app.job?.title}</h3>
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Building className="w-4 h-4" />
-                                {app.job?.company}
-                              </div>
-                            </div>
-                            <Badge className={getStatusColor(app.status)}>
-                              {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
-                            </Badge>
-                          </div>
-                          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" /> {app.job?.location}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <PoundSterling className="w-4 h-4" /> {formatSalary(app.job?.salary_min || null, app.job?.salary_max || null)}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" /> {app.job?.job_type}
-                            </span>
-                          </div>
-                        </div>
-                        <Button variant="outline" size="sm" onClick={() => app.job && openJobDetails(app.job)}>
-                          View Details
-                        </Button>
+          {/* Upcoming Interviews */}
+          {interviews.length > 0 && (
+            <Card className="border-emerald-500/20">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-emerald-600" />
+                  <CardTitle className="text-lg">Upcoming Interviews</CardTitle>
+                </div>
+                <CardDescription>Your scheduled interviews</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {interviews.map((app) => (
+                  <div
+                    key={app.id}
+                    className="flex items-center justify-between p-4 rounded-lg border bg-emerald-500/5 hover:bg-emerald-500/10 transition-colors cursor-pointer"
+                    onClick={() => app.job && openJobDetails(app.job)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-emerald-600/10 flex items-center justify-center">
+                        <Briefcase className="w-5 h-5 text-emerald-600" />
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* Available Jobs */}
-          <h2 className="font-serif text-xl font-bold pt-4">
-            {searchQuery || locationQuery ? 'Search Results' : 'Recommended For You'}
-          </h2>
-          <div className="space-y-4">
-            {jobs.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  No jobs found matching your criteria.
-                </CardContent>
-              </Card>
-            ) : (
-              jobs.map((job) => (
-                <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => openJobDetails(job)}>
-                  <CardContent className="p-4">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-semibold text-foreground">{job.title}</h3>
-                          {hasApplied(job.id) && (
-                            <Badge variant="outline" className="text-green-600 border-green-600">Applied</Badge>
-                          )}
+                      <div>
+                        <h4 className="font-semibold text-foreground">{app.job?.title}</h4>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1"><Building className="w-3 h-3" />{app.job?.company}</span>
+                          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{app.job?.location}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                          <Building className="w-4 h-4" />
-                          {job.company}
-                        </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" /> {job.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <PoundSterling className="w-4 h-4" /> {formatSalary(job.salary_min, job.salary_max)}
-                          </span>
-                          <span className="text-xs">{job.job_type}</span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="icon" onClick={() => toggleSaveJob(job.id)}>
-                          {isJobSaved(job.id) ? (
-                            <Bookmark className="w-4 h-4 fill-current text-primary" />
-                          ) : (
-                            <BookmarkPlus className="w-4 h-4" />
-                          )}
-                        </Button>
-                        <Button variant="royal" size="sm" onClick={() => openJobDetails(job)} disabled={hasApplied(job.id)}>
-                          {hasApplied(job.id) ? 'Applied' : 'Apply Now'}
-                        </Button>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-emerald-600">Interview</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(app.applied_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* All Applications Table */}
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg">Application Activity</CardTitle>
+                  <CardDescription>Complete history of your job applications</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={activityTab} onValueChange={setActivityTab} className="w-full">
+                <TabsList className="mb-4 w-full justify-start flex-wrap h-auto gap-1">
+                  <TabsTrigger value="all" className="text-xs">All ({applications.length})</TabsTrigger>
+                  <TabsTrigger value="applied" className="text-xs">Applied ({applications.filter(a => a.status === 'applied').length})</TabsTrigger>
+                  <TabsTrigger value="reviewing" className="text-xs">Reviewing ({reviewing.length})</TabsTrigger>
+                  <TabsTrigger value="interview" className="text-xs">Interview ({interviews.length})</TabsTrigger>
+                  <TabsTrigger value="offered" className="text-xs">Offered ({offered.length})</TabsTrigger>
+                  <TabsTrigger value="rejected" className="text-xs">Rejected ({rejected.length})</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value={activityTab}>
+                  {filteredApplications.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <AlertCircle className="w-12 h-12 text-muted-foreground/40 mb-3" />
+                      <p className="text-muted-foreground font-medium">No applications found</p>
+                      <p className="text-sm text-muted-foreground/70">
+                        {activityTab === 'all' ? "You haven't applied to any jobs yet." : `No applications with "${activityTab}" status.`}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Position</TableHead>
+                            <TableHead>Company</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead>Salary</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Applied</TableHead>
+                            <TableHead className="text-right">Action</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredApplications.map((app) => (
+                            <TableRow key={app.id} className="cursor-pointer" onClick={() => app.job && openJobDetails(app.job)}>
+                              <TableCell className="font-medium">{app.job?.title || 'N/A'}</TableCell>
+                              <TableCell>
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <Building className="w-3 h-3" />{app.job?.company || 'N/A'}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <MapPin className="w-3 h-3" />{app.job?.location || 'N/A'}
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {formatSalary(app.job?.salary_min || null, app.job?.salary_max || null)}
+                              </TableCell>
+                              <TableCell>{getStatusBadge(app.status)}</TableCell>
+                              <TableCell className="text-muted-foreground text-sm">
+                                {new Date(app.applied_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </TableCell>
+                              <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                                <Button variant="ghost" size="sm" onClick={() => app.job && openJobDetails(app.job)}>
+                                  View
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Interview Pipeline */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                Pipeline Overview
+              </CardTitle>
+              <CardDescription>Your application funnel</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {[
+                { label: 'Applied', count: applications.filter(a => a.status === 'applied').length, color: 'bg-blue-600' },
+                { label: 'Reviewing', count: reviewing.length, color: 'bg-amber-500' },
+                { label: 'Interview', count: interviews.length, color: 'bg-emerald-600' },
+                { label: 'Offered', count: offered.length, color: 'bg-violet-600' },
+                { label: 'Rejected', count: rejected.length, color: 'bg-red-500' },
+              ].map((stage) => (
+                <div key={stage.label}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-muted-foreground">{stage.label}</span>
+                    <span className="font-semibold">{stage.count}</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${stage.color} transition-all`}
+                      style={{ width: `${totalApplications > 0 ? (stage.count / totalApplications) * 100 : 0}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
           {/* Profile Strength */}
           <Card>
             <CardHeader>
@@ -330,10 +381,10 @@ export default function JobsDashboard() {
                 <FileText className="w-4 h-4" />
                 {userCV ? 'Manage CV' : 'Upload CV'}
               </Button>
-              <Button variant="outline" className="w-full justify-start gap-2" onClick={() => setAlertModalOpen(true)}>
-                <Search className="w-4 h-4" />
-                Set Job Alerts
-                {alerts.length > 0 && <Badge variant="secondary" className="ml-auto">{alerts.length}</Badge>}
+              <Button variant="outline" className="w-full justify-start gap-2">
+                <Users className="w-4 h-4" />
+                Saved Jobs
+                {savedJobs.length > 0 && <Badge variant="secondary" className="ml-auto">{savedJobs.length}</Badge>}
               </Button>
               <Button variant="outline" className="w-full justify-start gap-2">
                 <TrendingUp className="w-4 h-4" />
@@ -355,9 +406,7 @@ export default function JobsDashboard() {
         hasApplied={selectedJob ? hasApplied(selectedJob.id) : false}
       />
       <CVUploadModal open={cvModalOpen} onOpenChange={setCvModalOpen} currentCV={userCV} onRefresh={refreshCV} />
-      <JobAlertModal open={alertModalOpen} onOpenChange={setAlertModalOpen} alerts={alerts} onCreate={createAlert} onDelete={deleteAlert} />
       <ProfileImproveModal open={profileModalOpen} onOpenChange={setProfileModalOpen} userCV={userCV} jobs={allJobs} onRefresh={refreshCV} />
-      <FilterSheet open={filterOpen} onOpenChange={setFilterOpen} jobTypeFilter={jobTypeFilter} onJobTypeChange={setJobTypeFilter} />
     </DashboardLayout>
   );
 }
