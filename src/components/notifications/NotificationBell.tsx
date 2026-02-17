@@ -35,7 +35,7 @@ export const NotificationBell = () => {
       
       setUnreadCount(notificationCount);
       setNotifications(newNotification);
-      //fetchNotifications()
+      fetchNotifications();
       
       // Logic for sound or tab flashing could go here
     }

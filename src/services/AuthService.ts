@@ -219,6 +219,8 @@
 
 import { FileUploadDto } from "@/hooks/useJobs";
 import { UserProfile } from "./api";
+import { Product, Subscription } from "@/hooks/useSubscription";
+import { PaymentDetails } from "@/pages/PaymentSuccess";
 
 
  const API_BASE_URL =  import.meta.env.VITE_API_BASE_URL || '';
@@ -260,6 +262,12 @@ export interface AuthResponse {
   isLocked : boolean
 }
 
+export interface PaymentSession {
+  sessionId: string;
+  url: string;
+
+}
+
 export interface AuthError {
   message: string;
   status: number;
@@ -276,11 +284,13 @@ class AuthApiService {
     try {
       const reactBaseUrl = window.location.origin;
       const token = localStorage.getItem("accessToken");
+          const idempotencyKey = crypto.randomUUID();
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         // credentials: 'include', // Include cookies for session management
         headers: {
           'Content-Type': 'application/json',
+          'idempotency-key' : idempotencyKey,
           'X-Client-Base-Url': reactBaseUrl,
           'X-Client-Endpoint': "reset-password",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -388,7 +398,29 @@ class AuthApiService {
     const result =  this.request<RecentActivity []>("/auth/Activities");
     return result;
   }
+    getUserSubscriptions(): Promise<{ data: Subscription []| null; error: AuthError | null }> {
+    const result =  this.request<Subscription []>("/subscription/user-Subscriptions");
+    return result;
+  }
 
+     getUserProducts(): Promise<{ data: Product []| null; error: AuthError | null }> {
+    const result =  this.request<Product []>("/subscription/products");
+    return result;
+  }
+
+  getGetPaymentSession(productId: string): Promise<{ data: PaymentSession | null; error: AuthError | null }> {
+
+    const result =  this.request<PaymentSession>("/Payment/get-checkout-session?productId="+ productId);
+    return result;
+    
+  }
+
+   confirmPayment(sessionId: string): Promise<{ data: PaymentDetails | null; error: AuthError | null }> {
+
+    const result =  this.request<PaymentDetails>("/Payment/verify-payment?sessionId="+ sessionId);
+    return result;
+    
+  }
     lockUp(userId : string): Promise<{ data: UserProfile []| null; error: AuthError | null }> {
     const result =  this.request<UserProfile []>("/auth/" + userId + "/toggle-lock", {
         method: 'PATCH',

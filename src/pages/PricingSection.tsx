@@ -3,45 +3,50 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useSubscription } from '@/hooks/useSubscription';
+import { authApi } from '@/services/AuthService';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-const plans = [
-  {
-    name: 'Bronze',
-    price: '300',
-    tier: 'bronze',
-    description: 'Essential visa guidance to get you started.',
-    features: ['Visa Document Checklist', 'Email Support', 'Basic Guides'],
-  },
-  {
-    name: 'Silver',
-    price: '600',
-    tier: 'silver',
-    description: 'Full support from application to arrival.',
-    features: ['Priority Visa Processing', 'Job Placement Workshop', 'Accommodation Search', 'Direct Chat Support'],
-    popular: true,
-  },
-  {
-    name: 'Gold',
-    price: '1000',
-    tier: 'gold',
-    description: 'Comprehensive package including family and housing.',
-    features: ['Family Visa Support', 'NI Number Assistance', '1-on-1 Legal Consultation', 'Relocation Package', 'VIP Support'],
-  },
-];
+// const plans = [
+//   {
+//     name: 'Bronze',
+//     price: '300',
+//     tier: 'bronze',
+//     description: 'Essential visa guidance to get you started.',
+//     features: ['Visa Document Checklist', 'Email Support', 'Basic Guides'],
+//   },
+//   {
+//     name: 'Silver',
+//     price: '600',
+//     tier: 'silver',
+//     description: 'Full support from application to arrival.',
+//     features: ['Priority Visa Processing', 'Job Placement Workshop', 'Accommodation Search', 'Direct Chat Support'],
+//     popular: true,
+//   },
+//   {
+//     name: 'Gold',
+//     price: '1000',
+//     tier: 'gold',
+//     description: 'Comprehensive package including family and housing.',
+//     features: ['Family Visa Support', 'NI Number Assistance', '1-on-1 Legal Consultation', 'Relocation Package', 'VIP Support'],
+//   },
+// ];
 
 export function PricingSection() {
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const {products, setProducts} = useSubscription();
+    const navigate = useNavigate();
+  const plans = products;
+  const handleCheckout = async (productId: string) => {
+    setLoadingTier(productId);
 
-  const handleCheckout = async (tier: string) => {
-    setLoadingTier(tier);
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { tier },
-      });
-
+      const { data, error } = await authApi.getGetPaymentSession(productId)
+      
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.href = data.url;
+        // window.open(data.url, '_blank');
       }
     } catch (error: unknown) {
       console.error('Checkout error:', error);
@@ -57,9 +62,9 @@ export function PricingSection() {
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="font-serif text-4xl font-bold text-foreground mb-4">Simple, Transparent Pricing</h2>
+          <h2 className="font-serif text-4xl font-bold text-foreground mb-4">Subscription Pricing</h2>
           <p className="text-muted-foreground text-lg">Choose the plan that fits your UK journey goals.</p>
-          <p className="text-sm text-muted-foreground mt-2">(Test Mode - Use card 4242 4242 4242 4242)</p>
+
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -95,7 +100,7 @@ export function PricingSection() {
               <Button 
                 variant={plan.popular ? 'default' : 'outline'} 
                 className="w-full h-12"
-                onClick={() => handleCheckout(plan.tier)}
+                onClick={() => handleCheckout(plan.id)}
                 disabled={loadingTier !== null}
               >
                 {loadingTier === plan.tier ? <Loader2 className="animate-spin" /> : 'Get Started'}

@@ -59,6 +59,7 @@ export const useNotifications = () => {
   };
 
   const markAllAsRead = async () => {
+    alert("ssss");
     if (!user) return;
     
     try {
@@ -66,6 +67,7 @@ export const useNotifications = () => {
 
       if (error) throw error;
       
+ 
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {

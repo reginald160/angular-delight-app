@@ -84,7 +84,13 @@ export default function Auth() {
         toast.error('Invalid email or password. Please try again.');
       } else if (error.message.includes('Email not confirmed')) {
         toast.error('Please verify your email before logging in.');
-      } else {
+         navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
+      } else if (error.message.includes('Please verify your email before logging in'))
+      {      toast.error(error.message);
+            navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
+            return;
+      }
+      else {
         toast.error(error.message);
       }
       return;
@@ -140,8 +146,10 @@ export default function Auth() {
       return;
     }
 
-    toast.success('Account created successfully! Welcome to UK Pathway.');
-    navigate('/signup-success');
+    // toast.success('Account created successfully! Welcome to UK Pathway.');
+    // navigate('/signup-success');
+        toast.success('Account created! Please verify your email.');
+    navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
   };
 
   const handleGoogleSignIn = async () => {

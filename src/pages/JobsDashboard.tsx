@@ -19,13 +19,15 @@ import {
   TrendingUp,
   Loader2
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useJobs, Job } from '@/hooks/useJobs';
 import { JobDetailsModal } from '@/components/jobs/JobDetailsModal';
 import { CVUploadModal } from '@/components/jobs/CVUploadModal';
 import { JobAlertModal } from '@/components/jobs/JobAlertModal';
 import { ProfileImproveModal } from '@/components/jobs/ProfileImproveModal';
 import { FilterSheet } from '@/components/jobs/FilterSheet';
+import { useSubscription } from '@/hooks/useSubscription'
+import { useNavigate } from 'react-router-dom';
 
 export default function JobsDashboard() {
   const {
@@ -58,6 +60,9 @@ export default function JobsDashboard() {
   const [alertModalOpen, setAlertModalOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const { subscriptions}   = useSubscription();
+  const navigate = useNavigate();
+  
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -67,6 +72,14 @@ export default function JobsDashboard() {
       default: return 'bg-gray-600';
     }
   };
+
+  useEffect(() => {
+     if (!loading && subscriptions && subscriptions.length === 0) 
+      {
+    navigate("/price");
+    return;
+   }
+  }, [subscriptions, loading,]);
 
   const openJobDetails = (job: Job) => {
     setSelectedJob(job);

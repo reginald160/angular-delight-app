@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Phone, Briefcase, CheckCircle, Loader2 } from 'lucide-react';
+import { Phone, Briefcase, CheckCircle, Loader2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -66,6 +66,8 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfileCompletion() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+
   const navigate = useNavigate();
 
   const form = useForm<ProfileFormData>({
@@ -81,35 +83,38 @@ export default function ProfileCompletion() {
 
   const handleSubmit = async (data: ProfileFormData) => {
     setIsSubmitting(true);
-    
+
     try {
       const jobPreferences = {
         jobTypes: data.jobTypes,
         yearsOfExperience: data.yearsOfExperience,
-        preferredLocations: data.preferredLocations?.split(',').map(loc => loc.trim()).filter(Boolean) || [],
+        preferredLocations:
+          data.preferredLocations?.split(',').map((x) => x.trim()).filter(Boolean) || [],
       };
 
-      const { error } = await authApi.completeProfile(
-        data.phone,
-        data.industry,
-        jobPreferences
-      );
+      // Build multipart form-data
+      const formData = new FormData();
+      formData.append('phone', data.phone);
+      formData.append('industry', data.industry);
+      formData.append('jobPreferencesJson', JSON.stringify(jobPreferences));
+
+      if (cvFile) {
+        formData.append('cv', cvFile);
+      }
+
+      const { error } = await authApi.completeProfileWithCv(formData);
 
       if (error) {
         toast.error(error.message || 'Failed to complete profile');
-        setIsSubmitting(false);
         return;
       }
 
       toast.success('Profile completed successfully!');
-      
+
       const loginUser = await authApi.getCurrentAuthUser();
-      if (loginUser?.Role === 'Admin') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
-    } catch (err) {
+      if (loginUser?.Role === 'Admin') navigate('/admin');
+      else navigate('/dashboard');
+    } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -120,11 +125,8 @@ export default function ProfileCompletion() {
     try {
       await authApi.skipProfileCompletion();
       const loginUser = await authApi.getCurrentAuthUser();
-      if (loginUser?.Role === 'Admin') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
+      if (loginUser?.Role === 'Admin') navigate('/admin');
+      else navigate('/dashboard');
     } catch {
       navigate('/dashboard');
     }
@@ -156,21 +158,51 @@ export default function ProfileCompletion() {
                     <FormControl>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                        <Input
-                          {...field}
-                          type="tel"
-                          placeholder="+44 7123 456789"
-                          className="pl-10 h-12"
-                        />
+                        <Input {...field} type="tel" placeholder="+44 7123 456789" className="pl-10 h-12" />
                       </div>
                     </FormControl>
-                    <FormDescription>
-                      Employers may contact you at this number
-                    </FormDescription>
+                    <FormDescription>Employers may contact you at this number</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* CV Upload */}
+              <FormItem>
+                <FormLabel>Upload CV (Optional)</FormLabel>
+                <FormControl>
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <Upload className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                      <Input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        className="pl-10 h-12"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+
+                          // basic client-side check (keep server validation too)
+                          if (file && file.size > 5 * 1024 * 1024) {
+                            toast.error('CV must be 5MB or less');
+                            e.currentTarget.value = '';
+                            setCvFile(null);
+                            return;
+                          }
+
+                          setCvFile(file);
+                        }}
+                      />
+                    </div>
+
+                    {cvFile && (
+                      <p className="text-xs text-muted-foreground">
+                        Selected: <span className="font-medium">{cvFile.name}</span>
+                      </p>
+                    )}
+                  </div>
+                </FormControl>
+                <FormDescription>Accepted: PDF, DOC, DOCX. Max 5MB.</FormDescription>
+              </FormItem>
 
               {/* Industry */}
               <FormField
@@ -205,9 +237,7 @@ export default function ProfileCompletion() {
                 render={() => (
                   <FormItem>
                     <FormLabel>Job Type Preferences</FormLabel>
-                    <FormDescription>
-                      Select all that apply
-                    </FormDescription>
+                    <FormDescription>Select all that apply</FormDescription>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2">
                       {jobTypes.map((jobType) => (
                         <FormField
@@ -215,27 +245,18 @@ export default function ProfileCompletion() {
                           control={form.control}
                           name="jobTypes"
                           render={({ field }) => (
-                            <FormItem
-                              key={jobType.id}
-                              className="flex items-center space-x-3 space-y-0"
-                            >
+                            <FormItem className="flex items-center space-x-3 space-y-0">
                               <FormControl>
                                 <Checkbox
                                   checked={field.value?.includes(jobType.id)}
-                                  onCheckedChange={(checked) => {
-                                    return checked
+                                  onCheckedChange={(checked) =>
+                                    checked
                                       ? field.onChange([...field.value, jobType.id])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== jobType.id
-                                          )
-                                        );
-                                  }}
+                                      : field.onChange(field.value?.filter((v) => v !== jobType.id))
+                                  }
                                 />
                               </FormControl>
-                              <FormLabel className="font-normal cursor-pointer">
-                                {jobType.label}
-                              </FormLabel>
+                              <FormLabel className="font-normal cursor-pointer">{jobType.label}</FormLabel>
                             </FormItem>
                           )}
                         />
@@ -280,15 +301,9 @@ export default function ProfileCompletion() {
                   <FormItem>
                     <FormLabel>Preferred Locations (Optional)</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="e.g., London, Manchester, Birmingham"
-                        className="h-12"
-                      />
+                      <Input {...field} placeholder="e.g., London, Manchester, Birmingham" className="h-12" />
                     </FormControl>
-                    <FormDescription>
-                      Enter cities separated by commas
-                    </FormDescription>
+                    <FormDescription>Enter cities separated by commas</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -296,20 +311,11 @@ export default function ProfileCompletion() {
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="sm:flex-1 h-12"
-                  onClick={handleSkip}
-                >
+                <Button type="button" variant="outline" className="sm:flex-1 h-12" onClick={handleSkip}>
                   Skip for Now
                 </Button>
-                <Button
-                  type="submit"
-                  variant="royal"
-                  className="sm:flex-1 h-12"
-                  disabled={isSubmitting}
-                >
+
+                <Button type="submit" variant="royal" className="sm:flex-1 h-12" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />

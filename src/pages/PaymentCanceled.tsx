@@ -12,10 +12,10 @@ export default function PaymentCanceled() {
           <XCircle className="w-20 h-20 text-destructive" />
         </div>
         
-        <h1 className="text-3xl font-bold text-foreground">Payment Canceled</h1>
+        <h1 className="text-3xl font-bold text-foreground">Payment Failed</h1>
         
         <p className="text-muted-foreground">
-          Your payment was canceled. No charges were made to your account.
+          Your payment was Failed. No charges were made to your account.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

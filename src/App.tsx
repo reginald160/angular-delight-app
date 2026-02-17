@@ -27,6 +27,7 @@ import { PricingSection } from "./pages/PricingSection";
 import ProfileCompletion from "./pages/complete-profile";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
+import VerifyOtp from "./pages/verify-signup";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
                <Route path="/Confirm" element={<EmailConfirmation />} />
             <Route path="/signup-success" element={<SignupSuccess />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/very-signup" element={<VerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
             <Route path="/dashboard/profile" element={<AuthGuard><ProfileCompletion /></AuthGuard>} />
@@ -51,7 +53,7 @@ const App = () => (
             <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} />
             <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} />
             <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} />
-            <Route path="/payment-success" element={<AuthGuard><PaymentSuccess /></AuthGuard>} />
+            <Route path="/payment-status" element={<AuthGuard><PaymentSuccess /></AuthGuard>} />
             <Route path="/payment-canceled" element={<AuthGuard><PaymentCanceled /></AuthGuard>} />
             <Route path="/price" element={<AuthGuard><PricingSection /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />

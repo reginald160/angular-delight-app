@@ -241,7 +241,16 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-foreground">{activity.message}</p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    <p className="text-xs text-muted-foreground">
+                    {new Date(activity.time).toLocaleString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
+
                   </div>
                 </div>
               ))

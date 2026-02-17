@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface PaymentDetails {
+import { authApi } from "@/services/AuthService";
+export interface PaymentDetails {
   success: boolean;
   status: string;
   customer_email: string;
@@ -18,7 +18,7 @@ const PaymentSuccess = () => {
   const [loading, setLoading] = useState(true);
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+    const navigate = useNavigate();
   useEffect(() => {
     const verifyPayment = async () => {
       const sessionId = searchParams.get("session_id");
@@ -30,11 +30,15 @@ const PaymentSuccess = () => {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke("verify-payment", {
-          body: { session_id: sessionId },
-        });
-
+        const { data, error } = await authApi.confirmPayment(sessionId)
+        
         if (error) throw error;
+
+        if(data.success === false)
+        {
+          navigate("/payment-canceled");
+          return;
+        }
 
         setPaymentDetails(data);
       } catch (err: any) {
