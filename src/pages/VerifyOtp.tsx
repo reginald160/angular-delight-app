@@ -115,7 +115,7 @@ export default function VerifyOtp() {
 
       setIsVerified(true);
       toast.success('Email verified successfully!');
-      setTimeout(() => navigate('/auth'), 3000);
+      setTimeout(() => navigate('/complete-profile'), 3000);
     } catch {
       setError('Network error. Please try again.');
     } finally {
