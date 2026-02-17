@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Loader2, FileText } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,6 +31,7 @@ const signupSchema = z.object({
   email: z.string().trim().email({ message: 'Please enter a valid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
   confirmPassword: z.string(),
+  acceptTerms: z.literal(true, { errorMap: () => ({ message: 'You must accept the terms and conditions' }) }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -71,6 +73,7 @@ export default function Auth() {
       email: '',
       password: '',
       confirmPassword: '',
+      acceptTerms: false as unknown as true,
     },
   });
 
@@ -467,6 +470,45 @@ export default function Auth() {
                         </div>
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={signupForm.control}
+                  name="acceptTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-border p-4 bg-muted/30">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value === true}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          I have read and agree to the{' '}
+                          <a
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80 underline underline-offset-2 font-medium inline-flex items-center gap-1"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            Terms & Conditions
+                          </a>{' '}
+                          and{' '}
+                          <a
+                            href="/privacy"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80 underline underline-offset-2 font-medium"
+                          >
+                            Privacy Policy
+                          </a>
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
