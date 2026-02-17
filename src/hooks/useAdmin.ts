@@ -37,7 +37,7 @@ export const useAdmin = () => {
       setLoading(false);
       return;
     }
-    if(currentUser.role === "Admin")
+    if(currentUser.Role === "Admin")
     {
       setIsAdmin(true);
          setLoading(false);

@@ -54,7 +54,7 @@ const recentActivity = [
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const firstName = user?.firstName;   // User metadata not available from custom API
+  const firstName = user?.FirstName;   // User metadata not available from custom API
   const {fetchUserActivities, recentActivities} = useProfile()
 
   useEffect(() => {

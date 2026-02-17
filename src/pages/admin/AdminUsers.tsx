@@ -113,7 +113,7 @@ export default function AdminUsers() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setSelectedUser(u)}
+                    onClick={() => setSelectedUser(u as any)}
                     className="text-primary hover:bg-primary/10"
                   >
                     <Eye className="h-4 w-4" />

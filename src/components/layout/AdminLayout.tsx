@@ -112,7 +112,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">
-                  {user?.email}
+                  {user?.Email}
                 </p>
                 <p className="text-xs text-destructive font-medium">Admin</p>
               </div>
