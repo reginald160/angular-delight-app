@@ -24,6 +24,7 @@ import AdminChats from "./pages/admin/AdminChats";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import SignupSuccess from "./pages/SignupSuccess";
 import VerifyOtp from "./pages/VerifyOtp";
+import CompleteProfile from "./pages/CompleteProfile";
 import { PricingSection } from "./pages/PricingSection";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
                <Route path="/Confirm" element={<EmailConfirmation />} />
              <Route path="/signup-success" element={<SignupSuccess />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
+            <Route path="/complete-profile" element={<CompleteProfile />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
