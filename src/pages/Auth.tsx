@@ -45,7 +45,7 @@ export default function Auth() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { user, signIn, signUp, signInWithGoogle } = useAuth();
+  const { user, signIn, signUp } = useAuth();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function Auth() {
     toast.success('Welcome back!');
   
     const loginUser = await authApi.getCurrentAuthUser();
-    const role = loginUser.role;
+    const role = loginUser?.Role;
     if(role === 'Admin'){
       navigate('/admin');
     }
@@ -146,12 +146,9 @@ export default function Auth() {
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
-    const { error } = await signInWithGoogle();
+    // Google sign-in not yet implemented
+    toast.error('Google sign-in is not available yet.');
     setIsGoogleLoading(false);
-
-    if (error) {
-      toast.error('Failed to sign in with Google. Please try again.');
-    }
   };
 
   return (

@@ -13,14 +13,17 @@ export interface ServiceModule {
 export interface UserProfile {
   is_locked: any;
   subscription_type: string;
-  last_name: ReactNode;
-  first_name: ReactNode;
+  last_name: string | null;
+  first_name: string | null;
   id: string;
   name: string;
   email: string;
   userType: 'migrant' | 'resident' | 'employer';
   country?: string;
   visaStatus?: string;
+  phone?: string;
+  created_at?: string;
+  cv_url?: string;
 }
 
 export interface Application {
@@ -172,9 +175,13 @@ export const api = {
           id: '1',
           name: 'John Doe',
           email,
-          userType: 'migrant',
+          userType: 'migrant' as const,
           country: 'India',
           visaStatus: 'Skilled Worker',
+          is_locked: false,
+          subscription_type: 'Basic',
+          last_name: 'Doe',
+          first_name: 'John',
         },
       };
     }
@@ -191,6 +198,10 @@ export const api = {
         name: data.name || 'New User',
         email: data.email || '',
         userType: data.userType || 'migrant',
+        is_locked: false,
+        subscription_type: 'Basic',
+        last_name: data.last_name || null,
+        first_name: data.first_name || null,
       },
     };
   },

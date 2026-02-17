@@ -31,8 +31,8 @@ export function Header() {
   };
 
   const getInitials = () => {
-    if (!user?.email) return 'U';
-    return user.email.charAt(0).toUpperCase();
+    if (!user?.Email) return 'U';
+    return user.Email.charAt(0).toUpperCase();
   };
 
   return (
@@ -78,7 +78,7 @@ export function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium text-sm">{user.email}</p>
+                    <p className="font-medium text-sm">{user.Email}</p>
                   </div>
                 </div>
                 <DropdownMenuSeparator />

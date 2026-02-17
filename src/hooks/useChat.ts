@@ -84,11 +84,11 @@ export const useChat = () => {
               .configureLogging(signalR.LogLevel.Warning)
               .build();
 
-        const topic = user.role === "Admin" ? "ReceiveAdminMessage" : "ReceiveUserMessage";
+        const topic = user.Role === "Admin" ? "ReceiveAdminMessage" : "ReceiveUserMessage";
       // Handle incoming messages
       connection.on(topic, (message: ChatMessage) => {
 
-        if (message.sender_id !== user.id) {
+        if (message.sender_id !== user.Id) {
           setMessages(prev => {
             // Avoid duplicates
             if (prev.some(m => m.id === message.id)) return prev;
@@ -111,7 +111,7 @@ export const useChat = () => {
   
 
 
-        const { data: notif, error: notiError } = await notificationService.GetUserNotificationsAsync(user.id);
+        const { data: notif, error: notiError } = await notificationService.GetUserNotificationsAsync(user.Id);
 
         if (notiError) throw notiError;
 
@@ -259,7 +259,7 @@ export const useChat = () => {
     
     try {
       // Check if user already has an open conversation
-      const { data: existing , error: coreerror} =  await chatService.GetUserConversation(user.id);
+      const { data: existing , error: coreerror} =  await chatService.GetUserConversation(user.Id);
 
       if (existing != null) {
         const conversation = {
@@ -281,9 +281,9 @@ export const useChat = () => {
         return conversation;
       }
 
-      const { data, error } = await chatService.CreateConversation(user.id);
+      const { data, error } = await chatService.CreateConversation(user.Id);
 
-        const { data: exisnewing } =  await chatService.GetUserConversation(user.id);
+        const { data: exisnewing } =  await chatService.GetUserConversation(user.Id);
 
       const newConversation = {
         id: data?.id || data.id,
@@ -337,7 +337,7 @@ export const useChat = () => {
       const newMessage: ChatMessage = {
         id: messageId,
         conversation_id: convId,
-        sender_id: user.id,
+        sender_id: user.Id,
         content: content,
         is_read: false,
         created_at: time
@@ -352,11 +352,11 @@ export const useChat = () => {
           const newMessage: SignalRChatMessage = {
         id: messageId,
         conversation_id: convId,
-        sender_id: user.id,
+        sender_id: user.Id,
         content: content,
         is_read: false,
         created_at: time,
-        role : user.role
+        role : user.Role
       }; 
         
         await connectionRef.current.invoke('SendChatMessage', convId, newMessage);
@@ -387,7 +387,7 @@ export const useChat = () => {
     
     // Mark messages as read
     if (user) {
-        await chatService.ReadMessage(conversation.id, user.id);
+        await chatService.ReadMessage(conversation.id, user.Id);
 
     }
   };
@@ -412,7 +412,7 @@ export const useChat = () => {
         },
         (payload) => {
           const newMessage = payload.new as ChatMessage;
-          if (newMessage.sender_id !== user?.id) {
+          if (newMessage.sender_id !== user?.Id) {
             setMessages(prev => {
               if (prev.some(m => m.id === newMessage.id)) return prev;
               return [...prev, newMessage];

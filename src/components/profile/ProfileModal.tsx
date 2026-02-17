@@ -48,9 +48,9 @@ export const ProfileModal = ({ open, onOpenChange }: ProfileModalProps) =>  {
       const resp = await authApi.getCurrentUser1('');
     
       console.log('User data:', resp);
-      profile.first_name = resp.data?.firstName ?? null;
-      profile.last_name = resp.data?.lastName ?? null;
-      profile.phone = resp.data?.phone ?? null;
+      profile.first_name = resp.data?.FirstName ?? null;
+      profile.last_name = resp.data?.LastName ?? null;
+      profile.phone = resp.data?.Phone ?? null;
 
        setFormData({
         first_name: profile.first_name || 'Obi',

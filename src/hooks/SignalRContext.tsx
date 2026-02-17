@@ -32,7 +32,7 @@ export const SignalRProvider = ({ children }: { children: React.ReactNode }) => 
     // Global Notification Listener
     connection.on('ReceiveNotification', async (notification: any) => {
       try {
-        const { data: notif } = await notificationService.GetUserNotificationsAsync(user.id);
+        const { data: notif } = await notificationService.GetUserNotificationsAsync(user.Id);
         const unread = (notif as any[])?.filter(n => !n.is_read).length || 0;
         setNotificationCount(unread);
 

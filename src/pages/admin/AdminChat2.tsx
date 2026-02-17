@@ -30,7 +30,7 @@ export default function AdminChats() {
       const { data } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', user.id)
+        .eq('user_id', user.Id)
         .eq('role', 'admin')
         .maybeSingle();
       setIsAdmin(!!data);
@@ -150,13 +150,13 @@ export default function AdminChats() {
                           key={message.id}
                           className={cn(
                             "flex",
-                            message.sender_id === user?.id ? "justify-end" : "justify-start"
+                            message.sender_id === user?.Id ? "justify-end" : "justify-start"
                           )}
                         >
                           <div
                             className={cn(
                               "max-w-[80%] rounded-lg px-4 py-2",
-                              message.sender_id === user?.id
+                              message.sender_id === user?.Id
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-muted"
                             )}
@@ -164,7 +164,7 @@ export default function AdminChats() {
                             <p className="text-sm">{message.content}</p>
                             <p className={cn(
                               "text-xs mt-1",
-                              message.sender_id === user?.id
+                              message.sender_id === user?.Id
                                 ? "text-primary-foreground/70"
                                 : "text-muted-foreground"
                             )}>

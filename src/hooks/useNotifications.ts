@@ -28,7 +28,7 @@ export const useNotifications = () => {
     if (!user) return;
     
     try {
-      const { data: notif, error: notiError } = await notificationService.GetUserNotificationsAsync(user.id)
+      const { data: notif, error: notiError } = await notificationService.GetUserNotificationsAsync(user.Id)
       
 
       if (notiError) throw notiError;
@@ -36,7 +36,7 @@ export const useNotifications = () => {
       const formattedNotifications = (notif as NotificationModel[]) || [];
 
     setNotifications(formattedNotifications);
-      setUnreadCount(notif?.filter(n => !n.is_read).length || 0);
+      setUnreadCount(formattedNotifications.filter(n => !n.is_read).length || 0);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
@@ -62,7 +62,7 @@ export const useNotifications = () => {
     if (!user) return;
     
     try {
-      const { error } = await notificationService.ReadAllNotificationsAsync(user.id)
+      const { error } = await notificationService.ReadAllNotificationsAsync(user.Id)
 
       if (error) throw error;
       
@@ -89,10 +89,10 @@ export const useNotifications = () => {
           event: 'INSERT',
           schema: 'public',
           table: 'notifications',
-          filter: `user_id=eq.${user.id}`
+          filter: `user_id=eq.${user.Id}`
         },
         (payload) => {
-          const newNotification = payload.new as Notification;
+          const newNotification = payload.new as NotificationModel;
           setNotifications(prev => [newNotification, ...prev]);
           setUnreadCount(prev => prev + 1);
           toast({

@@ -101,8 +101,8 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                    <User className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                   <p className="text-xs font-semibold truncate">{user?.email?.split('@')[0]}</p>
-                   <p className="text-[10px] text-muted-foreground truncate">{user?.email}</p>
+                   <p className="text-xs font-semibold truncate">{user?.Email?.split('@')[0]}</p>
+                   <p className="text-[10px] text-muted-foreground truncate">{user?.Email}</p>
                 </div>
              </div>
             
