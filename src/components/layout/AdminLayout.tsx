@@ -11,7 +11,8 @@ import {
   User,
   Menu,
   X,
-  Home
+  Home,
+  UserCheck
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,7 @@ const navItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/jobs', label: 'Manage Jobs', icon: Briefcase },
   { path: '/admin/users', label: 'Users', icon: Users },
+  { path: '/admin/user-details', label: 'User Details', icon: UserCheck },
   { path: '/admin/notifications', label: 'Notifications', icon: Bell },
   { path: '/admin/chats', label: 'Chats', icon: MessageSquare },
 ];

@@ -19,6 +19,7 @@ import AuthGuard from "./contexts/AuthGuard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminJobs from "./pages/admin/AdminJobs";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminUserDetails from "./pages/admin/AdminUserDetails";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminChats from "./pages/admin/AdminChats";
 import EmailConfirmation from "./pages/EmailConfirmation";
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/jobs" element={<AuthGuard><AdminJobs /></AuthGuard>} />
             <Route path="/admin/users" element={<AuthGuard><AdminUsers /></AuthGuard>} />
+            <Route path="/admin/user-details" element={<AuthGuard><AdminUserDetails /></AuthGuard>} />
             <Route path="/admin/notifications" element={<AuthGuard><AdminNotifications /></AuthGuard>} />
             <Route path="/admin/chats" element={<AuthGuard><AdminChats /></AuthGuard>} />
 
