@@ -22,6 +22,10 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminUserDetails from "./pages/admin/AdminUserDetails";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminChats from "./pages/admin/AdminChats";
+import AdminInterviews from "./pages/admin/AdminInterviews";
+import AdminApplications from "./pages/admin/AdminApplications";
+import MyInterviews from "./pages/MyInterviews";
+import MyApplications from "./pages/MyApplications";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import SignupSuccess from "./pages/SignupSuccess";
 import VerifyOtp from "./pages/VerifyOtp";
@@ -62,6 +66,10 @@ const App = () => (
             <Route path="/admin/user-details" element={<AuthGuard><AdminUserDetails /></AuthGuard>} />
             <Route path="/admin/notifications" element={<AuthGuard><AdminNotifications /></AuthGuard>} />
             <Route path="/admin/chats" element={<AuthGuard><AdminChats /></AuthGuard>} />
+            <Route path="/admin/interviews" element={<AuthGuard><AdminInterviews /></AuthGuard>} />
+            <Route path="/admin/applications" element={<AuthGuard><AdminApplications /></AuthGuard>} />
+            <Route path="/dashboard/my-interviews" element={<AuthGuard><MyInterviews /></AuthGuard>} />
+            <Route path="/dashboard/my-applications" element={<AuthGuard><MyApplications /></AuthGuard>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

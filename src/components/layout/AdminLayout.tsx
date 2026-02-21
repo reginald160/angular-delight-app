@@ -12,7 +12,9 @@ import {
   Menu,
   X,
   Home,
-  UserCheck
+  UserCheck,
+  Calendar,
+  FileText
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -25,6 +27,8 @@ interface AdminLayoutProps {
 const navItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/jobs', label: 'Manage Jobs', icon: Briefcase },
+  { path: '/admin/applications', label: 'Applications', icon: FileText },
+  { path: '/admin/interviews', label: 'Interviews', icon: Calendar },
   { path: '/admin/users', label: 'Users', icon: Users },
   { path: '/admin/user-details', label: 'User Details', icon: UserCheck },
   { path: '/admin/notifications', label: 'Notifications', icon: Bell },
