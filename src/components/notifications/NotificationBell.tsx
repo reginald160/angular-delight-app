@@ -31,7 +31,7 @@ export const NotificationBell = () => {
     useEffect(() => {
     if (notificationCount > 0 && !open) {
 
-       //alert(notificationCount.toString())
+
       
       setUnreadCount(notificationCount);
       setNotifications(newNotification);

@@ -1,7 +1,9 @@
-import { ArrowRight, MessageCircle, Phone } from 'lucide-react';
+import { ArrowRight, Link, MessageCircle, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 export function CTASection() {
+ const navigate = useNavigate();
   return (
     <section id="contact" className="py-24 bg-hero relative overflow-hidden">
       {/* Background Elements */}
@@ -22,13 +24,15 @@ export function CTASection() {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button variant="hero" size="xl" className="group">
+            <Button variant="hero" size="xl" className="group" onClick={()=> navigate("/auth")}>
               Get Free Assessment
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="heroOutline" size="xl">
+            <Button variant="heroOutline" size="xl" onClick={()=> navigate("/auth")}>
+              
               <MessageCircle className="w-5 h-5" />
               Talk to an Advisor
+
             </Button>
           </div>
 

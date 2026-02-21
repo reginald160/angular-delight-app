@@ -122,7 +122,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 </div>
              </div>
             
-            <Button variant="outline" size="sm" className="w-full justify-start gap-2" onClick={() => setProfileOpen(true)}>
+            <Button variant="outline" size="sm" className="w-full justify-start gap-2" onClick={() => navigate('/dashboard/profile')}>
               <Settings className="w-4 h-4" /> Profile
             </Button>
              <Button

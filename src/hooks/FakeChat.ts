@@ -107,7 +107,7 @@ export const useChat = () => {
   try {
         // 1. Update the Count immediately for UI responsiveness
         // setNotificationCount(prev => prev + 1);
-       alert(notification);
+
         // 2. Refresh the list from the service
         const { data: notif, error: notiError } = await notificationService.GetUserNotificationsAsync(user.id);
 

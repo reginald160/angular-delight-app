@@ -1,8 +1,18 @@
 const API_BASE_URL = 'http://localhost:8082/api/v1';
 
 export interface AuthUser {
-  id: string;
+ id: string; // Guid
   email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  cv: string; // Typically the raw text or metadata
+  phone: string;
+  industry: string;
+  jobPreferencesJson: string; // You may want to JSON.parse this later
+  cvUrl: string;
+  profileCompletedAtUtc: string | null; // ISO Date string
+  profileCompleted: boolean;
 }
 
 export interface AuthResponse {

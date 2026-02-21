@@ -28,6 +28,8 @@ import ProfileCompletion from "./pages/complete-profile";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import VerifyOtp from "./pages/verify-signup";
+import Terms from "./pages/terms";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,8 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/very-signup" element={<VerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
             <Route path="/dashboard/profile" element={<AuthGuard><ProfileCompletion /></AuthGuard>} />
             {/* <Route path="/dashboard/pricing" element={<AuthGuard><PricingSection /></AuthGuard>} /> */}

@@ -217,7 +217,7 @@
 // export const authApi = new AuthApiService();
 
 
-import { FileUploadDto } from "@/hooks/useJobs";
+import { CVAnalysis, FileUploadDto } from "@/hooks/useJobs";
 import { UserProfile } from "./api";
 import { Product, Subscription } from "@/hooks/useSubscription";
 import { PaymentDetails } from "@/pages/PaymentSuccess";
@@ -246,13 +246,18 @@ export interface UsersResponse {
 }
 
 export interface LoginUser {
-  Id: string;
-  Email: string;
-    FirstName: string;
-      LastName: string;
-      Role: string
-      CV: string;
-      Phone: string;
+id: string; // Guid
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  cv: string; // Typically the raw text or metadata
+  phone: string;
+  industry: string;
+  jobPreferencesJson: string; // You may want to JSON.parse this later
+  cvUrl: string;
+  profileCompletedAtUtc: string | null; // ISO Date string
+  profileCompleted: boolean;
 }
 
 
@@ -267,13 +272,27 @@ export interface PaymentSession {
   url: string;
 
 }
-
+export interface AuthMeResponse {
+  id: string; // Guid
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  cv: string; // Typically the raw text or metadata
+  phone: string;
+  industry: string;
+  jobPreferencesJson: string; // You may want to JSON.parse this later
+  cvUrl: string;
+  profileCompletedAtUtc: string | null; // ISO Date string
+  profileCompleted: boolean;
+}
 export interface AuthError {
   message: string;
   status: number;
 }
 
 class AuthApiService {
+ 
     completeProfile(phone: string, industry: string, jobPreferences: { jobTypes: string[]; yearsOfExperience: string; preferredLocations: string[]; }): { error: any; } | PromiseLike<{ error: any; }> {
         throw new Error('Method not implemented.');
     }
@@ -376,16 +395,25 @@ class AuthApiService {
     });
   }
 
+   async UpdateCVAnalysis( analysis: CVAnalysis 
+    
+  ): Promise<{ data: LoginUser | null; error: AuthError | null }> {
+    return this.request<LoginUser>('/Jobs/UpdateCVAnalysis', {
+      method: 'PUT',
+      body: JSON.stringify(analysis),
+    });
+  }
+
   async getCurrentUser(email:string): Promise<{ data: LoginUser | null; error: AuthError | null }> {
 
     const result =  this.request<LoginUser>("/auth/me");
-    console.log("getCurrentUser result", result.then(res => console.log(res.data)));
+    //console.log("getCurrentUser result", result.then(res => console.log(res.data)));
     return result;
   }
    getCurrentUser1(email:string): Promise<{ data: LoginUser | null; error: AuthError | null }> {
 
     const result =  this.request<LoginUser>("/auth/me");
-    console.log("getCurrentUser result", result.then(res => console.log(res.data)));
+    //console.log("getCurrentUser result", result.then(res => console.log(res.data)));
     return result;
   }
 
@@ -408,6 +436,39 @@ class AuthApiService {
     return result;
   }
 
+  async  completeProfileWithCv(formData :  FormData) : Promise<{ data: LoginUser | null; error: string | null }> {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+  const token = localStorage.getItem('accessToken');
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/complete`, {
+      method: 'PATCH',
+      body: formData, // Browser automatically sets Content-Type to multipart/form-data
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        // DO NOT set 'Content-Type': 'application/json' here
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      return { 
+        data: null, 
+        error: result.message || 'Update failed' 
+      };
+    }
+
+    return { data: result, error: null };
+  } catch (error) {
+    return { 
+      data: null, 
+      error: 'Network error or server unreachable' 
+    };
+  }
+}
+  
+  
   getGetPaymentSession(productId: string): Promise<{ data: PaymentSession | null; error: AuthError | null }> {
 
     const result =  this.request<PaymentSession>("/Payment/get-checkout-session?productId="+ productId);

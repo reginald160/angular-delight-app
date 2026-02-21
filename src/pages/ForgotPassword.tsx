@@ -109,7 +109,7 @@ const handleSubmit = async (data: ForgotPasswordFormData) => {
             </div>
             <div className="flex flex-col">
               <span className="font-serif font-bold text-xl text-foreground">UK Pathway</span>
-              <span className="text-xs text-muted-foreground">Your Journey Starts Here</span>
+              <span className="text-xs text-muted-foreground">Your Career Journey Starts Here</span>
             </div>
           </div>
 

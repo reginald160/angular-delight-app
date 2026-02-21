@@ -42,7 +42,7 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-serif font-bold text-2xl">UK Pathway</span>
-                <span className="text-sm text-primary-foreground/70">Your Journey Starts Here</span>
+                <span className="text-sm text-primary-foreground/70">Your Career Journey Starts Here</span>
               </div>
             </Link>
             <p className="text-primary-foreground/80 mb-6 max-w-sm">
@@ -51,7 +51,7 @@ export function Footer() {
             <div className="flex flex-col gap-3 text-sm text-primary-foreground/80">
               <a href="mailto:support@pathway-hub.com" className="flex items-center gap-2 hover:text-primary-foreground transition-colors">
                 <Mail className="w-4 h-4" />
-                hello@ukpathway.com
+                support@pathway-hub.com
               </a>
               <a href="tel:+442012345678" className="flex items-center gap-2 hover:text-primary-foreground transition-colors">
                 <Phone className="w-4 h-4" />

@@ -59,7 +59,7 @@ export const useNotifications = () => {
   };
 
   const markAllAsRead = async () => {
-    alert("ssss");
+
     if (!user) return;
     
     try {

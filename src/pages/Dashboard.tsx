@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -91,6 +91,24 @@ export default function Dashboard() {
   const { user } = useAuth();
   const firstName = user?.firstName;   // User metadata not available from custom API
   const {fetchUserActivities, recentActivities} = useProfile();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+   useEffect(() => {
+    const isProfilePage = location.pathname === '/dashboard/profile';
+    
+    if (user && !user.profileCompleted && !isProfilePage) {
+      // Redirect to profile page if not completed and not already there
+      navigate('/dashboard/profile');
+    }
+  }, [user, navigate, location.pathname]);
+
+  useEffect(() => {
+    // Only fetch activities if the user is authorized/profile is okay
+    if (user?.profileCompleted) {
+      fetchUserActivities();
+    }
+  }, [user?.profileCompleted]);
 
   const enabledServices = useMemo(() => {
     return services.filter(service => 

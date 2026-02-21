@@ -52,7 +52,7 @@ export const useSubscription = () => {
   }
 
    const fetchUserSubscription = async ()=> {
-    
+    setLoading(true);
     try {
       const { data, error } = await  authApi.getUserSubscriptions();
       if (error) throw error;
