@@ -31,6 +31,8 @@ const navItems = [
   { path: '/dashboard/visa', label: 'Visa Support', icon: FileText },
   { path: '/dashboard/housing', label: 'Housing', icon: Home },
   { path: '/dashboard/jobs', label: 'Jobs', icon: Briefcase },
+  { path: '/dashboard/my-applications', label: 'My Applications', icon: FileText },
+  { path: '/dashboard/my-interviews', label: 'My Interviews', icon: Briefcase },
   { path: '/dashboard/driving', label: 'Driving', icon: Car },
 ];
 
