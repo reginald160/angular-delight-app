@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_job_applications: {
+        Row: {
+          admin_notes: string | null
+          applied_date: string
+          company: string
+          created_at: string
+          created_by: string | null
+          id: string
+          job_title: string
+          job_type: string | null
+          location: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          applied_date?: string
+          company: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          job_title: string
+          job_type?: string | null
+          location?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          applied_date?: string
+          company?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          job_title?: string
+          job_type?: string | null
+          location?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       chat_conversations: {
         Row: {
           admin_id: string | null
@@ -355,6 +403,54 @@ export type Database = {
           file_size?: number | null
           id?: string
           is_primary?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_interviews: {
+        Row: {
+          admin_notes: string | null
+          company: string
+          created_at: string
+          created_by: string | null
+          id: string
+          interview_date: string
+          interview_type: string
+          job_title: string
+          location: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          company: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          interview_date: string
+          interview_type?: string
+          job_title: string
+          location?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          company?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          interview_date?: string
+          interview_type?: string
+          job_title?: string
+          location?: string | null
+          notes?: string | null
+          status?: string
           updated_at?: string
           user_id?: string
         }
