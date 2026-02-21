@@ -8,6 +8,7 @@ import {
   Briefcase, 
   Car, 
   LogOut, 
+  CreditCard,
   User,
   Menu,
   X,
@@ -34,6 +35,7 @@ const navItems = [
   { path: '/dashboard/my-applications', label: 'My Applications', icon: FileText },
   { path: '/dashboard/my-interviews', label: 'My Interviews', icon: Briefcase },
   { path: '/dashboard/driving', label: 'Driving', icon: Car },
+  { path: '/dashboard/subscription', label: 'Subscription', icon: CreditCard },
 ];
 
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {

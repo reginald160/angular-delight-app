@@ -33,6 +33,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import { PricingSection } from "./pages/PricingSection";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import SubscriptionPage from "./pages/SubscriptionPage";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} />
             <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} />
             <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} />
+            <Route path="/dashboard/subscription" element={<AuthGuard><SubscriptionPage /></AuthGuard>} />
             <Route path="/price" element={<AuthGuard><PricingSection /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/jobs" element={<AuthGuard><AdminJobs /></AuthGuard>} />
