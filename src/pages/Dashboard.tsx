@@ -2,11 +2,16 @@ import { Link } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Home, Briefcase, Car, ArrowRight, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { FileText, Home, Briefcase, Car, ArrowRight, CheckCircle, Clock, AlertCircle, Users, TrendingUp } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { authApi } from '@/services/AuthService';
 import { useProfile } from '@/hooks/useProfile';
-import { useEffect } from 'react';
+import { useJobs } from '@/hooks/useJobs';
+import { CVUploadModal } from '@/components/jobs/CVUploadModal';
+import { ProfileImproveModal } from '@/components/jobs/ProfileImproveModal';
+import { useEffect, useState } from 'react';
 
 
 const services = [
@@ -54,12 +59,25 @@ const recentActivity = [
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const firstName = user?.FirstName;   // User metadata not available from custom API
-  const {fetchUserActivities, recentActivities} = useProfile()
+  const firstName = user?.FirstName;
+  const { fetchUserActivities, recentActivities } = useProfile();
+  const { userCV, savedJobs, refreshCV, allJobs } = useJobs();
+  const [cvModalOpen, setCvModalOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+
+  const profileStats = userCV?.analysis_result ? [
+    { label: 'Profile Completion', value: userCV.analysis_result.profileCompletion },
+    { label: 'CV Strength', value: userCV.analysis_result.cvStrength },
+    { label: 'Skills Match', value: userCV.analysis_result.skillsMatch },
+  ] : [
+    { label: 'Profile Completion', value: 0 },
+    { label: 'CV Strength', value: 0 },
+    { label: 'Skills Match', value: 0 },
+  ];
 
   useEffect(() => {
-  fetchUserActivities();
-}, []);
+    fetchUserActivities();
+  }, []);
 
 
   return (
@@ -163,34 +181,96 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Recent Activity */}
-      <h2 className="font-serif text-xl font-bold text-foreground mb-4">Recent Activity</h2>
-      <Card>
-        <CardContent className="p-0">
-          <div className="divide-y divide-border">
-            {recentActivities.map((activity, index) => (
-              <div key={index} className="flex items-center gap-4 p-4">
-                <div className={`p-2 rounded-full ${
-                  activity.status === 'success' ? 'bg-green-500/10' :
-                  activity.status === 'pending' ? 'bg-yellow-500/10' : 'bg-blue-500/10'
-                }`}>
-                  {activity.status === 'success' ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                  ) : activity.status === 'pending' ? (
-                    <Clock className="w-4 h-4 text-yellow-600" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-blue-600" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{activity.message}</p>
-                  <p className="text-xs text-muted-foreground">{activity.time}</p>
-                </div>
+      {/* Bottom Grid: Recent Activity + Profile Strength & Quick Actions */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Recent Activity */}
+        <div className="lg:col-span-2">
+          <h2 className="font-serif text-xl font-bold text-foreground mb-4">Recent Activity</h2>
+          <Card>
+            <CardContent className="p-0">
+              <div className="divide-y divide-border">
+                {recentActivities.map((activity, index) => (
+                  <div key={index} className="flex items-center gap-4 p-4">
+                    <div className={`p-2 rounded-full ${
+                      activity.status === 'success' ? 'bg-green-500/10' :
+                      activity.status === 'pending' ? 'bg-yellow-500/10' : 'bg-blue-500/10'
+                    }`}>
+                      {activity.status === 'success' ? (
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                      ) : activity.status === 'pending' ? (
+                        <Clock className="w-4 h-4 text-yellow-600" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 text-blue-600" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">{activity.message}</p>
+                      <p className="text-xs text-muted-foreground">{activity.time}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar: Profile Strength & Quick Actions */}
+        <div className="space-y-6">
+          {/* Profile Strength */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Profile Strength</CardTitle>
+              <CardDescription>
+                {userCV ? 'Improve your profile to get more matches' : 'Upload your CV to get started'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {profileStats.map((stat) => (
+                <div key={stat.label}>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">{stat.label}</span>
+                    <span className="font-medium">{stat.value}%</span>
+                  </div>
+                  <Progress value={stat.value} className="h-2" />
+                </div>
+              ))}
+              <Button variant="outline" className="w-full" onClick={() => setProfileModalOpen(true)}>
+                Improve Profile
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Button variant="outline" className="w-full justify-start gap-2" onClick={() => setCvModalOpen(true)}>
+                <FileText className="w-4 h-4" />
+                {userCV ? 'Manage CV' : 'Upload CV'}
+              </Button>
+              <Button variant="outline" className="w-full justify-start gap-2" asChild>
+                <Link to="/dashboard/jobs">
+                  <Users className="w-4 h-4" />
+                  Saved Jobs
+                  {savedJobs.length > 0 && <Badge variant="secondary" className="ml-auto">{savedJobs.length}</Badge>}
+                </Link>
+              </Button>
+              <Button variant="outline" className="w-full justify-start gap-2" asChild>
+                <Link to="/dashboard/jobs">
+                  <TrendingUp className="w-4 h-4" />
+                  Salary Insights
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Modals */}
+      <CVUploadModal open={cvModalOpen} onOpenChange={setCvModalOpen} currentCV={userCV} onRefresh={refreshCV} />
+      <ProfileImproveModal open={profileModalOpen} onOpenChange={setProfileModalOpen} userCV={userCV} jobs={allJobs} onRefresh={refreshCV} />
     </DashboardLayout>
   );
 }

@@ -347,51 +347,6 @@ export default function JobsDashboard() {
             </CardContent>
           </Card>
 
-          {/* Profile Strength */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Profile Strength</CardTitle>
-              <CardDescription>
-                {userCV ? 'Improve your profile to get more matches' : 'Upload your CV to get started'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {profileStats.map((stat) => (
-                <div key={stat.label}>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">{stat.label}</span>
-                    <span className="font-medium">{stat.value}%</span>
-                  </div>
-                  <Progress value={stat.value} className="h-2" />
-                </div>
-              ))}
-              <Button variant="outline" className="w-full" onClick={() => setProfileModalOpen(true)}>
-                Improve Profile
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start gap-2" onClick={() => setCvModalOpen(true)}>
-                <FileText className="w-4 h-4" />
-                {userCV ? 'Manage CV' : 'Upload CV'}
-              </Button>
-              <Button variant="outline" className="w-full justify-start gap-2">
-                <Users className="w-4 h-4" />
-                Saved Jobs
-                {savedJobs.length > 0 && <Badge variant="secondary" className="ml-auto">{savedJobs.length}</Badge>}
-              </Button>
-              <Button variant="outline" className="w-full justify-start gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Salary Insights
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
 
