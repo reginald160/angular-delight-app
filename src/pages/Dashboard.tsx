@@ -11,6 +11,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { useJobs } from '@/hooks/useJobs';
 import { CVUploadModal } from '@/components/jobs/CVUploadModal';
 import { ProfileImproveModal } from '@/components/jobs/ProfileImproveModal';
+import { RecentActivityCard } from '@/components/dashboard/RecentActivityCard';
 import { useEffect, useState } from 'react';
 
 
@@ -186,32 +187,7 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <div className="lg:col-span-2">
           <h2 className="font-serif text-xl font-bold text-foreground mb-4">Recent Activity</h2>
-          <Card>
-            <CardContent className="p-0">
-              <div className="divide-y divide-border">
-                {recentActivities.map((activity, index) => (
-                  <div key={index} className="flex items-center gap-4 p-4">
-                    <div className={`p-2 rounded-full ${
-                      activity.status === 'success' ? 'bg-green-500/10' :
-                      activity.status === 'pending' ? 'bg-yellow-500/10' : 'bg-blue-500/10'
-                    }`}>
-                      {activity.status === 'success' ? (
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                      ) : activity.status === 'pending' ? (
-                        <Clock className="w-4 h-4 text-yellow-600" />
-                      ) : (
-                        <AlertCircle className="w-4 h-4 text-blue-600" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">{activity.message}</p>
-                      <p className="text-xs text-muted-foreground">{activity.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <RecentActivityCard activities={recentActivities || []} />
         </div>
 
         {/* Sidebar: Profile Strength & Quick Actions */}
