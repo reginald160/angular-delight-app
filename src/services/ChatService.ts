@@ -15,6 +15,7 @@ export interface ChatResponse
   createdAt: string;
   updatedAt: string;
   lastMessageAt: string;
+  name: string
 
 }
 

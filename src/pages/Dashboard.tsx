@@ -97,7 +97,7 @@ export default function Dashboard() {
    useEffect(() => {
     const isProfilePage = location.pathname === '/dashboard/profile';
     
-    if (user && !user.profileCompleted && !isProfilePage) {
+    if (user && !user.profileCompleted && !isProfilePage && user.role != "Admin") {
       // Redirect to profile page if not completed and not already there
       navigate('/dashboard/profile');
     }
@@ -189,7 +189,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Services Grid - Only display if enabled in SERVICE_CONFIG */}
+     {/*
       <h2 className="font-serif text-xl font-bold text-foreground mb-4">Your Services</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {useMemo(() => 
@@ -227,7 +227,7 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Empty State Fallback */}
+
       {useMemo(() => 
         ALL_SERVICES.filter(service => 
           SERVICE_CONFIG[service.id as keyof typeof SERVICE_CONFIG]
@@ -235,7 +235,7 @@ export default function Dashboard() {
         <div className="text-center py-20 border-2 border-dashed rounded-3xl mb-8">
           <p className="text-muted-foreground">No services are currently active for your portal.</p>
         </div>
-      )}
+      )} */}
 
       {/* Recent Activity */}
       <h2 className="font-serif text-xl font-bold text-foreground mb-4">Recent Activity</h2>

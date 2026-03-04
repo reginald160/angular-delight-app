@@ -54,10 +54,10 @@ export function ServicesSection() {
             Our Services
           </span>
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
-            Comprehensive UK Migration Solutions
+            Professional Career Support Designed to Get You Noticed
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From your first step to full settlement, we provide end-to-end support for your UK journey.
+            We help you present your best profile and manage your job search efficiently.
           </p>
         </div>
 

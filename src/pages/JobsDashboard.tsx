@@ -118,7 +118,7 @@ const ENABLE_AVAILABLE_JOBS = import.meta.env.VITE_ENABLE_AVAILABLE_JOBS === 'tr
     useEffect(() => {
     const isProfilePage = location.pathname === '/dashboard/profile';
     
-    if (user && !user.profileCompleted && !isProfilePage) {
+    if (user && !user.profileCompleted && !isProfilePage && user.role != "Admin") {
       // Redirect to profile page if not completed and not already there
       navigate('/dashboard/profile', { replace: true });
     }
@@ -240,7 +240,7 @@ const ENABLE_AVAILABLE_JOBS = import.meta.env.VITE_ENABLE_AVAILABLE_JOBS === 'tr
       url.searchParams.set('page', String(page));
       url.searchParams.set('pageSize', String(PAGE_SIZE));
 
-      const token = localStorage.getItem('accessToken');
+      const token = sessionStorage.getItem('accessToken');
 
       const resp = await fetch(url.toString(), {
         headers: {

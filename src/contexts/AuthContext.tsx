@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
       setUser(data);
-      localStorage.setItem("authUser", JSON.stringify(data));
+      sessionStorage.setItem("authUser", JSON.stringify(data));
     } catch {
       setUser(null);
     }
@@ -46,15 +46,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     // run once on app mount
     (async () => {
-      const token = localStorage.getItem("accessToken");
+      const token = sessionStorage.getItem("accessToken");
       if (!token) {
         setLoading(false);
         return;
       }
 
-      await loadCurrentUser(localStorage.getItem("email") || "");
+      await loadCurrentUser(sessionStorage.getItem("email") || "");
       setLoading(false);
-       const cached = localStorage.getItem("authUser");
+       const cached = sessionStorage.getItem("authUser");
       if (cached) setUser(JSON.parse(cached));
     })();
   }, []);
@@ -79,9 +79,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       return { error: new Error(error?.message ?? "Login failed") };
     }
 
-    localStorage.setItem("accessToken", data.accessToken);
-    localStorage.setItem("refreshToken", data.refreshToken);
-      localStorage.setItem("email", email);
+    sessionStorage.setItem("accessToken", data.accessToken);
+    sessionStorage.setItem("refreshToken", data.refreshToken);
+      sessionStorage.setItem("email", email);
 
     // IMPORTANT: hydrate user immediately so ProtectedRoute passes
     await loadCurrentUser(email);
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const signOut: AuthContextType["signOut"] = async () => {
     // optional: call backend logout if you have it
-    // await authApi.logout(localStorage.getItem("refreshToken") ?? "");
+    // await authApi.logout(sessionStorage.getItem("refreshToken") ?? "");
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");

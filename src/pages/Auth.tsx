@@ -182,16 +182,15 @@ export default function Auth() {
             UK Pathway Hub
           </h1>
           <p className="text-white/80 text-lg max-w-md mb-8">
-            Your comprehensive platform for navigating life in the United Kingdom.
-            From visas to housing, we've got you covered.
+            We optimise and manage your applications to maximise interview opportunities.
           </p>
 
           <div className="grid grid-cols-2 gap-4 max-w-sm">
             {[
-              { icon: '🛂', label: 'Visa Support' },
-              { icon: '🏠', label: 'Housing' },
-              { icon: '💼', label: 'Jobs' },
-              { icon: '🚗', label: 'Driving' },
+              { icon: '🛂', label: 'Job applications' },
+              { icon: '🏠', label: 'Interviews' },
+              { icon: '💼', label: 'Offer' },
+              { icon: '🚗', label: 'Dream jobs' },
             ].map((item) => (
               <div key={item.label} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <span className="text-2xl mb-2 block">{item.icon}</span>

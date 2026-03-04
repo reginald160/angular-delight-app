@@ -74,6 +74,19 @@ export default function ProfileCompletion() {
   const [cvFile, setCvFile] = useState<File | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
+   const isFirstTimeProfile = user ? !user.profileCompleted : true;
+    const mustUploadCv = isFirstTimeProfile && !user?.cvUrl && !cvFile;
+
+  // Example: you might enforce completion for certain roles/plans
+  const mustCompleteForRole = user?.role === 'User' && isFirstTimeProfile; // adjust as needed
+
+  const shouldDisableSkip = mustUploadCv || mustCompleteForRole;
+  const skipDisabledReason = mustUploadCv
+    ? 'Please upload your CV to continue.'
+    : mustCompleteForRole
+      ? 'Profile completion is required before you can continue.'
+      : '';
+
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -146,9 +159,16 @@ export default function ProfileCompletion() {
 
       toast.success('Profile completed successfully!');
       const loginUser = await authApi.getCurrentAuthUser();
-      if (loginUser?.Role === 'Admin') navigate('/admin');
-      else navigate('/dashboard');
-      return;
+      if (loginUser?.Role === 'Admin'){
+          navigate('/admin');
+          return;
+      }
+      else{
+               
+       navigate('/dashboard');
+       return;
+      }
+
     } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {
@@ -156,7 +176,12 @@ export default function ProfileCompletion() {
     }
   };
 
-  const handleSkip = async () => {
+    const handleSkip = async () => {
+    if (shouldDisableSkip) {
+      toast.error(skipDisabledReason || 'You cannot skip profile completion right now.');
+      return;
+    }
+
     try {
       await authApi.skipProfileCompletion();
       const loginUser = await authApi.getCurrentAuthUser();
@@ -412,9 +437,16 @@ export default function ProfileCompletion() {
 
                 {/* Actions */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <Button type="button" variant="outline" className="sm:flex-1 h-12" onClick={handleSkip}>
-                    Skip for Now
-                  </Button>
+                      <Button
+                      type="button"
+                      variant="outline"
+                      className="sm:flex-1 h-12"
+                      onClick={handleSkip}
+                      disabled={isSubmitting || shouldDisableSkip}
+                      title={shouldDisableSkip ? skipDisabledReason : 'Skip for now'}
+                    >
+                      Skip for Now
+                    </Button>
 
                   <Button type="submit" variant="royal" className="sm:flex-1 h-12" disabled={isSubmitting}>
                     {isSubmitting ? (

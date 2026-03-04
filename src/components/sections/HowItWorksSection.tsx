@@ -5,13 +5,13 @@ const steps = [
   {
     number: '01',
     icon: ClipboardCheck,
-    title: 'Register & Select',
-    description: 'Create your profile and choose the services you need — visa, job search, housing, or all of them.',
+    title: 'Register & Choose Your Package',
+    description: 'Create your profile and select the level of support you need.',
   },
   {
     number: '02',
     icon: UserCheck,
-    title: 'Get Matched',
+    title: 'Profile Review',
     description: 'Our advisors review your profile and match you with the right opportunities and resources.',
   },
   {
@@ -23,8 +23,8 @@ const steps = [
   {
     number: '04',
     icon: Award,
-    title: 'Settle & Thrive',
-    description: 'Arrive in the UK fully prepared with housing, job, and all essentials sorted.',
+    title: 'Interview & Career Support',
+    description: 'Receive interview preparation and ongoing job search guidance.',
   },
 ];
 
@@ -41,7 +41,7 @@ export function HowItWorksSection() {
             Your Journey in 4 Simple Steps
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            We've streamlined the entire migration process to make your UK dream achievable.
+            We've streamlined the entire process to make your career dream achievable.
           </p>
         </div>
 

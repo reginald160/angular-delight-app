@@ -25,7 +25,7 @@ class NotificationService {
     try {
         
       const token =
-      localStorage.getItem("accessToken");
+      sessionStorage.getItem("accessToken");
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         // credentials: 'include', // Include cookies for session management

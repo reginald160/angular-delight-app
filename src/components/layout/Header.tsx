@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -73,12 +73,17 @@ export function Header() {
         <div className="hidden lg:flex items-center gap-3">
           {user ? (
             <div className="flex items-center gap-4">
-              <Link
+             <NavLink
                 to="/dashboard"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className={({ isActive }) =>
+                  cn(
+                    "text-sm font-medium transition-colors",
+                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                  )
+                }
               >
                 Dashboard
-              </Link>
+              </NavLink>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">

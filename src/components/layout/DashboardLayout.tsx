@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   Settings,
-  ChevronRight
+  ChevronRight,
+  Calendar
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
@@ -29,7 +30,7 @@ interface DashboardLayoutProps {
 const SERVICE_CONFIG = {
   visa: false,     // Set to false to hide
   housing: false,
-  jobs: true,
+  jobs: false,
   driving: false, // Currently disabled globally
 } as const;
 
@@ -38,6 +39,8 @@ const navItems = [
   { id: 'visa', path: '/dashboard/visa', label: 'Visa Support', icon: FileText },
   { id: 'housing', path: '/dashboard/housing', label: 'Housing', icon: Home },
   { id: 'jobs', path: '/dashboard/jobs', label: 'Jobs', icon: Briefcase },
+  { id: 'Applications', path: '/dashboard/my-applications', label: 'My Applications', icon: FileText },
+  { id: 'Interviews', path: '/dashboard/my-interviews', label: 'My Interviews', icon: Calendar },
   { id: 'driving', path: '/dashboard/driving', label: 'Driving', icon: Car },
 ];
 
@@ -53,7 +56,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const visibleNavItems = useMemo(() => {
     return navItems.filter((item) => {
       // Always show dashboard
-      if (item.id === 'overview') return true;
+      if (item.id === 'overview' || item.id === 'Interviews' || item.id == 'Applications') return true;
 
       // Check the static config instead of the user object
       return SERVICE_CONFIG[item.id as keyof typeof SERVICE_CONFIG] === true;

@@ -36,7 +36,7 @@ export function useCVUpload(onSuccess?: () => void) {
       formData.append("file", file, fileName); // must match API parameter name: IFormFile file
         const endpoint = authApi.getBaseUrl() + "/files/upload";
 
-        const token = localStorage.getItem("accessToken");
+        const token = sessionStorage.getItem("accessToken");
        const response = await axios.post(endpoint, formData, {
         headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),

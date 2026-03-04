@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 type JwtPayload = { exp?: number };
 
 export function getAccessToken() {
-  return localStorage.getItem("accessToken");
+  return sessionStorage.getItem("accessToken");
 }
 
 export function isTokenValid(token: string | null) {

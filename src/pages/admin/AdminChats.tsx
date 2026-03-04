@@ -16,7 +16,7 @@ import { LoginUser } from '@/services/AuthService';
 
 export default function AdminChats() {
 
-    const localUser = localStorage.getItem("authUser");
+    const localUser = sessionStorage.getItem("authUser");
      const currentUser = JSON.parse(localUser) as LoginUser;
 
   const [user, setUser] = useState<LoginUser>(currentUser)
@@ -118,7 +118,7 @@ export default function AdminChats() {
                           <User className="h-5 w-5 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">User {conv.user_id.slice(0, 8)}...</p>
+                          <p className="font-medium truncate"> {conv.user_name}...</p>
                           <p className="text-xs text-muted-foreground">
                             {formatDistanceToNow(new Date(conv.last_message_at), { addSuffix: true })}
                           </p>
@@ -142,7 +142,7 @@ export default function AdminChats() {
               <CardHeader className="border-b">
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5" />
-                  User {currentConversation.user_id.slice(0, 8)}...
+                   {currentConversation.user_name.slice(0, 8)}...
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 p-0 flex flex-col">

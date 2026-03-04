@@ -30,6 +30,10 @@ import PaymentCanceled from "./pages/PaymentCanceled";
 import VerifyOtp from "./pages/verify-signup";
 import Terms from "./pages/terms";
 import Privacy from "./pages/Privacy";
+import AdminInterviews from "./pages/admin/AdminInterviews";
+import MyApplications from "./pages/MyApplications";
+import AdminApplications from "./pages/admin/AdminApplication";
+import MyInterviews from "./pages/MyInterviews";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +64,10 @@ const App = () => (
             <Route path="/payment-status" element={<AuthGuard><PaymentSuccess /></AuthGuard>} />
             <Route path="/payment-canceled" element={<AuthGuard><PaymentCanceled /></AuthGuard>} />
             <Route path="/price" element={<AuthGuard><PricingSection /></AuthGuard>} />
+            <Route path="/admin/interviews" element={<AuthGuard><AdminInterviews /></AuthGuard>} />
+            <Route path="/admin/application" element={<AuthGuard><AdminApplications /></AuthGuard>} />
+            <Route path="/dashboard/my-interviews" element={<AuthGuard><MyInterviews /></AuthGuard>} />
+            <Route path="/dashboard/my-applications" element={<AuthGuard><MyApplications /></AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/jobs" element={<AuthGuard><AdminJobs /></AuthGuard>} />
             <Route path="/admin/users" element={<AuthGuard><AdminUsers /></AuthGuard>} />

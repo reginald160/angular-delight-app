@@ -74,7 +74,7 @@ export const useChat = () => {
                  skipNegotiation: true,  // skipNegotiation as we specify WebSockets
                  transport: signalR.HttpTransportType.WebSockets,  // force WebSocket transport
                 accessTokenFactory: async () => {
-                  const token = localStorage.getItem("accessToken");
+                  const token = sessionStorage.getItem("accessToken");
                   return token || '';
                 }
               })

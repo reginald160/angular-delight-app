@@ -53,7 +53,7 @@
 //   ): Promise<{ data: T | null; error: AuthError | null }> {
 //     try {
 //       const reactBaseUrl = window.location.origin;
-//       const token = localStorage.getItem("accessToken");
+//       const token = sessionStorage.getItem("accessToken");
 //       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
 //         ...options,
 //         // credentials: 'include', // Include cookies for session management
@@ -121,7 +121,7 @@
 //   }
 
 //   async logout(): Promise<{ error: AuthError | null }> {
-//     //     const refreshToken = localStorage.getItem("refreshToken");
+//     //     const refreshToken = sessionStorage.getItem("refreshToken");
 
 //     // const { error } = await this.request<void>('/auth/logout', {
 //     //   method: 'POST',
@@ -182,7 +182,7 @@
 //   }
 
 //     async getCurrentAuthUser(): Promise<LoginUser | null> {
-//   const userData = localStorage.getItem("authUser");
+//   const userData = sessionStorage.getItem("authUser");
 
 //   if (!userData) {
 //     return null;
@@ -195,7 +195,7 @@
 //   }
 // };
 //   async getAuthUser(): Promise<AuthUser | null> {
-//   const userData = localStorage.getItem("authUser");
+//   const userData = sessionStorage.getItem("authUser");
 
 //   if (!userData) {
 //     return null;
@@ -302,7 +302,7 @@ class AuthApiService {
   ): Promise<{ data: T | null; error: AuthError | null }> {
     try {
       const reactBaseUrl = window.location.origin;
-      const token = localStorage.getItem("accessToken");
+      const token = sessionStorage.getItem("accessToken");
           const idempotencyKey = crypto.randomUUID();
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
@@ -372,7 +372,7 @@ class AuthApiService {
   }
 
   async logout(): Promise<{ error: AuthError | null }> {
-    //     const refreshToken = localStorage.getItem("refreshToken");
+    //     const refreshToken = sessionStorage.getItem("refreshToken");
 
     // const { error } = await this.request<void>('/auth/logout', {
     //   method: 'POST',
@@ -438,7 +438,7 @@ class AuthApiService {
 
   async  completeProfileWithCv(formData :  FormData) : Promise<{ data: LoginUser | null; error: string | null }> {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-  const token = localStorage.getItem('accessToken');
+  const token = sessionStorage.getItem('accessToken');
 
   try {
     const response = await fetch(`${API_BASE_URL}/auth/complete`, {
@@ -500,7 +500,7 @@ class AuthApiService {
   }
 
     async getCurrentAuthUser(): Promise<LoginUser | null> {
-  const userData = localStorage.getItem("authUser");
+  const userData = sessionStorage.getItem("authUser");
 
   if (!userData) {
     return null;
@@ -513,7 +513,7 @@ class AuthApiService {
   }
 };
   async getAuthUser(): Promise<AuthUser | null> {
-  const userData = localStorage.getItem("authUser");
+  const userData = sessionStorage.getItem("authUser");
 
   if (!userData) {
     return null;
