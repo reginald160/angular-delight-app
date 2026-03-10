@@ -16,9 +16,10 @@ import {
   FileText,
   Lightbulb
 } from 'lucide-react';
-import { UserCV, CVAnalysis, Job } from '@/hooks/useJobs';
+import { UserCV, CVAnalysis, Job, useJobs } from '@/hooks/useJobs';
 import { useCVUpload } from '@/hooks/useCVUpload';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProfileImproveModalProps {
   open: boolean;
@@ -32,8 +33,10 @@ export function ProfileImproveModal({ open, onOpenChange, userCV, jobs, onRefres
   const { analyzeCV, analyzing } = useCVUpload(onRefresh);
   const [selectedJobId, setSelectedJobId] = useState<string>('');
   const [manualCVText, setManualCVText] = useState('');
+  const {userCVAnalysis} = useJobs();
+    const { user } = useAuth();
 
-  const analysis = userCV?.analysis_result;
+      const analysis = userCVAnalysis;
 
   const handleAnalyze = async () => {
     if (!userCV) return;
@@ -228,7 +231,7 @@ export function ProfileImproveModal({ open, onOpenChange, userCV, jobs, onRefres
                   </Card>
 
                   {/* Missing Skills */}
-                  {analysis.missingSkills && analysis.missingSkills.length > 0 && (
+                  {analysis.missingSkills && analysis.missingSkills.length > 0  && (
                     <Card>
                       <CardHeader className="pb-2">
                         <CardTitle className="text-base flex items-center gap-2">

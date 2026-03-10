@@ -24,6 +24,18 @@ import AdminChats from "./pages/admin/AdminChats";
 import EmailConfirmation from "./pages/EmailConfirmation";
 import SignupSuccess from "./pages/SignupSuccess";
 import { PricingSection } from "./pages/PricingSection";
+import ProfileCompletion from "./pages/complete-profile";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCanceled from "./pages/PaymentCanceled";
+import VerifyOtp from "./pages/verify-signup";
+import Terms from "./pages/Terms"
+import Privacy from "./pages/Privacy";
+import AdminInterviews from "./pages/admin/AdminInterviews";
+import MyApplications from "./pages/MyApplications";
+import AdminApplications from "./pages/admin/AdminApplication";
+import MyInterviews from "./pages/MyInterviews";
+import UserProfile from "./pages/user-profile";
+import ProfileGuard from "./contexts/ProfileGuard";
 
 const queryClient = new QueryClient();
 
@@ -40,13 +52,49 @@ const App = () => (
                <Route path="/Confirm" element={<EmailConfirmation />} />
             <Route path="/signup-success" element={<SignupSuccess />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/very-signup" element={<VerifyOtp />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
-            <Route path="/dashboard/visa" element={<AuthGuard><VisaDashboard /></AuthGuard>} />
-            <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} />
-            <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} />
-            <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} />
-            <Route path="/price" element={<AuthGuard><PricingSection /></AuthGuard>} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/dashboard" element={<AuthGuard>
+                <ProfileGuard>
+                 <Dashboard />
+                </ProfileGuard>
+             
+            
+            </AuthGuard>} />
+            <Route path="/completeProfile" element={<AuthGuard>
+              <ProfileGuard>
+              <ProfileCompletion />
+              </ProfileGuard>
+              </AuthGuard>} />
+            <Route path="/dashboard/profile" element={<AuthGuard>< UserProfile/></AuthGuard>} />
+            {/* <Route path="/dashboard/pricing" element={<AuthGuard><PricingSection /></AuthGuard>} /> */}
+            {/* <Route path="/dashboard/visa" element={<AuthGuard><VisaDashboard /></AuthGuard>} />
+            <Route path="/dashboard/housing" element={<AuthGuard><HousingDashboard /></AuthGuard>} /> */}
+            {/* <Route path="/dashboard/jobs" element={<AuthGuard><JobsDashboard /></AuthGuard>} /> */}
+            {/* <Route path="/dashboard/driving" element={<AuthGuard><DrivingDashboard /></AuthGuard>} /> */}
+            <Route path="/payment-status" element={<AuthGuard><PaymentSuccess /></AuthGuard>} />
+            <Route path="/payment-canceled" element={<AuthGuard><PaymentCanceled /></AuthGuard>} />
+            <Route path="/price" element={<AuthGuard>
+              <ProfileGuard>
+              <PricingSection />
+              </ProfileGuard>
+         
+            
+            </AuthGuard>} />
+            <Route path="/admin/interviews" element={<AuthGuard><AdminInterviews /></AuthGuard>} />
+            <Route path="/admin/application" element={<AuthGuard><AdminApplications /></AuthGuard>} />
+            <Route path="/dashboard/my-interviews" element={<AuthGuard>
+              <ProfileGuard>
+                 <MyInterviews />
+              </ProfileGuard>
+             </AuthGuard>} />
+            <Route path="/dashboard/my-applications" element={<AuthGuard>
+              <ProfileGuard>
+              <MyApplications />
+              </ProfileGuard>
+              </AuthGuard>} />
             <Route path="/admin" element={<AuthGuard><AdminDashboard /></AuthGuard>} />
             <Route path="/admin/jobs" element={<AuthGuard><AdminJobs /></AuthGuard>} />
             <Route path="/admin/users" element={<AuthGuard><AdminUsers /></AuthGuard>} />

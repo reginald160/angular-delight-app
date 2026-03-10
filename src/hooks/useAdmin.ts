@@ -30,7 +30,7 @@ export const useAdmin = () => {
   
     try {
 
-     const authUser = localStorage.getItem("authUser");
+     const authUser = sessionStorage.getItem("authUser");
      const currentUser = JSON.parse(authUser) as LoginUser;
     if (!currentUser) {
       setIsAdmin(false);

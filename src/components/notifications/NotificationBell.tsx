@@ -31,11 +31,11 @@ export const NotificationBell = () => {
     useEffect(() => {
     if (notificationCount > 0 && !open) {
 
-       //alert(notificationCount.toString())
+
       
       setUnreadCount(notificationCount);
       setNotifications(newNotification);
-      //fetchNotifications()
+      fetchNotifications();
       
       // Logic for sound or tab flashing could go here
     }

@@ -57,7 +57,7 @@ export function CVUploadModal({
     if (open) {
       fetchUserCV();
     }
-  }, [open, onRefresh]);
+  }, [open]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { authApi, AuthUser } from "@/services/AuthService";
 import axios from "axios";
+import { CVAnalysis } from './useJobs';
 
 export function useCVUpload(onSuccess?: () => void) {
   const { user } = useAuth();
@@ -35,7 +36,7 @@ export function useCVUpload(onSuccess?: () => void) {
       formData.append("file", file, fileName); // must match API parameter name: IFormFile file
         const endpoint = authApi.getBaseUrl() + "/files/upload";
 
-        const token = localStorage.getItem("accessToken");
+        const token = sessionStorage.getItem("accessToken");
        const response = await axios.post(endpoint, formData, {
         headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -92,13 +93,11 @@ export function useCVUpload(onSuccess?: () => void) {
       }
 
       if (data?.analysis) {
-
-        console.log('CV analysis result:', data.analysis);
+        
+       
         // Save analysis results to the CV record
-        await supabase
-          .from('user_cvs')
-          .update({ analysis_result: data.analysis })
-          .eq('id', cvId);
+        await  authApi.UpdateCVAnalysis(data?.analysis);
+     
 
         toast.success('CV analysis complete!');
         onSuccess?.();

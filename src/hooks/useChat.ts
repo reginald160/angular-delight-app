@@ -35,6 +35,7 @@ export interface ChatConversation {
   updated_at: string;
   last_message_at: string;
   status: string;
+   user_name: string;
 }
 
 const SIGNALR_HUB_URL = import.meta.env.VITE_SIGNALR_HUB_URL || '';
@@ -76,7 +77,7 @@ export const useChat = () => {
                   skipNegotiation: true,  // skipNegotiation as we specify WebSockets
                  transport: signalR.HttpTransportType.WebSockets,  // force WebSocket transport
                 accessTokenFactory: async () => {
-                  const token = localStorage.getItem("accessToken");
+                  const token = sessionStorage.getItem("accessToken");
                   return token || '';
                 }
               })
@@ -204,7 +205,7 @@ export const useChat = () => {
   }, [user, initializeConnection]);
 
   const fetchConversations = async () => {
-    
+   
     if (!user) return;
     
     try {
@@ -221,7 +222,8 @@ export const useChat = () => {
                 created_at: item.createdAt || item.CreatedAt,
                 updated_at: item.updatedAt || item.UpdatedAt,
                 last_message_at: item.lastMessageAt || item.LastMessageAt,
-                status: item.status || item.Status
+                status: item.status || item.Status,
+                user_name: item.name || item.name
               }));
                  if (error) throw error;
               setConversations(mappedConversations || []);
@@ -244,7 +246,8 @@ export const useChat = () => {
                 sender_id: item.senderId,
                 content: item.content,
                 is_read: item.ssRead,
-                created_at: item.createdAt
+                created_at: item.createdAt,
+                user_name : item.name
               }));
 
       if (error) throw error;
@@ -270,7 +273,8 @@ export const useChat = () => {
         created_at: existing.createdAt || existing.createdAt,
         updated_at: existing.updatedAt || existing.updatedAt,
         last_message_at: existing.lastMessageAt || existing.lastMessageAt,
-        status: existing.status || existing.status
+        status: existing.status || existing.status,
+        user_name : existing.name || existing.name
         }
         setCurrentConversation(conversation);
         await fetchMessages(conversation.id);
@@ -293,9 +297,9 @@ export const useChat = () => {
         created_at: data?.createdAt || data.createdAt,
         updated_at: data?.updatedAt || data.updatedAt,
         last_message_at: data?.lastMessageAt || data.lastMessageAt,
-        status: data?.status || data.status
+        status: data?.status || data.status,
+        user_name : data?.name || data.name
       };
-
 
 
       if (error) throw error;

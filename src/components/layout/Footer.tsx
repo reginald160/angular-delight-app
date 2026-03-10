@@ -3,16 +3,16 @@ import { Mail, Phone, MapPin, Linkedin, Twitter, Facebook, Instagram } from 'luc
 
 const footerLinks = {
   services: [
-    { name: 'Admission & Visa', href: '#' },
-    { name: 'Job & Sponsorship', href: '#' },
-    { name: 'Accommodation', href: '#' },
-    { name: 'Driving Test', href: '#' },
+    { name: 'CV Optimisation & Profile Enhancement', href: '#' },
+    { name: 'Managed Job Application Support', href: '#' },
+    { name: 'Interview Preparation', href: '#' },
+    // { name: 'Driving Test', href: '#' },
   ],
   company: [
     { name: 'About Us', href: '#' },
     { name: 'Careers', href: '#' },
     { name: 'Partners', href: '#' },
-    { name: 'Press', href: '#' },
+    // { name: 'Press', href: '#' },
   ],
   support: [
     { name: 'Help Center', href: '#' },
@@ -42,16 +42,16 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-serif font-bold text-2xl">UK Pathway</span>
-                <span className="text-sm text-primary-foreground/70">Your Journey Starts Here</span>
+                <span className="text-sm text-primary-foreground/70">Your Career Journey Starts Here</span>
               </div>
             </Link>
             <p className="text-primary-foreground/80 mb-6 max-w-sm">
-              The unified digital ecosystem simplifying migration, employment, and settlement in the United Kingdom.
+              Professional job application management and career development services for ambitious professionals.
             </p>
             <div className="flex flex-col gap-3 text-sm text-primary-foreground/80">
               <a href="mailto:support@pathway-hub.com" className="flex items-center gap-2 hover:text-primary-foreground transition-colors">
                 <Mail className="w-4 h-4" />
-                hello@ukpathway.com
+                support@pathway-hub.com
               </a>
               <a href="tel:+442012345678" className="flex items-center gap-2 hover:text-primary-foreground transition-colors">
                 <Phone className="w-4 h-4" />

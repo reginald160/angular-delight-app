@@ -1,1 +1,5 @@
-project_id = "mrdpecqviqahlejupmic"
+project_id = "mrdpecqviqahlejupmic",
+[
+functions.create-checkout
+]
+verify_jwt = false

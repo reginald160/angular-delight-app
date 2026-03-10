@@ -1,0 +1,10 @@
+Card Number	Description
+4242 4242 4242 4242	Successful payment
+4000 0000 0000 3220	3D Secure authentication
+4000 0000 0000 9995	Declined (insufficient funds)
+4000 0000 0000 0002	Declined (generic)
+For all test cards:
+
+Expiry: Any future date (e.g., 12/34)
+CVC: Any 3 digits (e.g., 123)
+ZIP: Any 5 digits (e.g., 12345)

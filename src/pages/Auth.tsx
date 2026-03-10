@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, Loader2, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { authApi } from '@/services/AuthService';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Please enter a valid email address' }),
@@ -30,6 +31,9 @@ const signupSchema = z.object({
   email: z.string().trim().email({ message: 'Please enter a valid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
   confirmPassword: z.string(),
+  acceptTerms: z.literal(true, {
+    errorMap: () => ({ message: 'You must accept the terms and conditions' }),
+  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -71,39 +75,58 @@ export default function Auth() {
       email: '',
       password: '',
       confirmPassword: '',
+      acceptTerms: false as unknown as true, // Initialize as false
     },
   });
 
-  const handleLogin = async (data: LoginFormData) => {
-    setIsSubmitting(true);
-    const { error } = await signIn(data.email, data.password);
-    setIsSubmitting(false);
+const handleLogin = async (data: LoginFormData) => {
+  setIsSubmitting(true);
 
-    if (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        toast.error('Invalid email or password. Please try again.');
-      } else if (error.message.includes('Email not confirmed')) {
-        toast.error('Please verify your email before logging in.');
-      } else {
-        toast.error(error.message);
-      }
+  const { error } = await signIn(data.email, data.password);
+
+  setIsSubmitting(false);
+
+  if (error) {
+    if (error.message.includes('Invalid login credentials')) {
+      toast.error('Invalid email or password. Please try again.');
+    } 
+    else if (error.message.includes('Email not confirmed')) {
+      toast.error('Please verify your email before logging in.');
+      navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
+    } 
+    else if (error.message.includes('Please verify your email before logging in')) {
+      toast.error(error.message);
+      navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
       return;
+    } 
+    else {
+      toast.error(error.message);
     }
-    toast.success('Welcome back!');
 
-    const loginUser = await authApi.getCurrentAuthUser();
-    const role = loginUser.role;
-    if(role === 'Admin'){
-      navigate('/admin');
-    }
-    else{
-      navigate('/dashboard');
-    };
+    return;
+  }
 
+  toast.success('Welcome back!');
 
+  // 🔹 Get redirect URL if present
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect");
 
+  if (redirect) {
+    navigate(redirect);
+    return;
+  }
 
-  };
+  // 🔹 fallback to role-based routing
+  const loginUser = await authApi.getCurrentAuthUser();
+  const role = loginUser.role;
+
+  if (role === "Admin") {
+    navigate("/admin");
+  } else {
+    navigate("/dashboard");
+  }
+};
 
   const CheckRole = async () => {
 
@@ -140,8 +163,10 @@ export default function Auth() {
       return;
     }
 
-    toast.success('Account created successfully! Welcome to UK Pathway.');
-    navigate('/signup-success');
+    // toast.success('Account created successfully! Welcome to UK Pathway.');
+    // navigate('/signup-success');
+        toast.success('Account created! Please verify your email.');
+    navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
   };
 
   const handleGoogleSignIn = async () => {
@@ -169,16 +194,15 @@ export default function Auth() {
             UK Pathway Hub
           </h1>
           <p className="text-white/80 text-lg max-w-md mb-8">
-            Your comprehensive platform for navigating life in the United Kingdom.
-            From visas to housing, we've got you covered.
+            We optimise and manage your applications to maximise interview opportunities.
           </p>
 
           <div className="grid grid-cols-2 gap-4 max-w-sm">
             {[
-              { icon: '🛂', label: 'Visa Support' },
-              { icon: '🏠', label: 'Housing' },
-              { icon: '💼', label: 'Jobs' },
-              { icon: '🚗', label: 'Driving' },
+              { icon: '🛂', label: 'Job applications' },
+              { icon: '🏠', label: 'Interviews' },
+              { icon: '💼', label: 'Offer' },
+              { icon: '🚗', label: 'Dream jobs' },
             ].map((item) => (
               <div key={item.label} className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                 <span className="text-2xl mb-2 block">{item.icon}</span>
@@ -208,7 +232,7 @@ export default function Auth() {
             </div>
             <div className="flex flex-col">
               <span className="font-serif font-bold text-xl text-foreground">UK Pathway</span>
-              <span className="text-xs text-muted-foreground">Your Journey Starts Here</span>
+              <span className="text-xs text-muted-foreground">Your Career Journey Starts Here</span>
             </div>
           </div>
 
@@ -473,6 +497,46 @@ export default function Auth() {
                     </FormItem>
                   )}
                 />
+
+                <FormField
+  control={signupForm.control}
+  name="acceptTerms"
+  render={({ field }) => (
+    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-border p-4 bg-muted/30">
+      <FormControl>
+        {/* The styled component handles its own internal state and checkmark */}
+        <Checkbox
+          checked={field.value}
+          onCheckedChange={field.onChange}
+        />
+      </FormControl>
+      <div className="space-y-1 leading-none">
+        <FormLabel className="text-sm font-normal cursor-pointer">
+          I have read and agree to the{' '}
+          <a
+            href="/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:text-primary/80 underline underline-offset-2 font-medium inline-flex items-center gap-1"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            Terms & Conditions
+          </a>{' '}
+          and{' '}
+          <a
+            href="/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:text-primary/80 underline underline-offset-2 font-medium"
+          >
+            Privacy Policy
+          </a>
+        </FormLabel>
+        <FormMessage />
+      </div>
+    </FormItem>
+  )}
+/>
 
                 <Button
                   type="submit"

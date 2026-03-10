@@ -42,7 +42,7 @@ export function TestimonialsSection() {
             Hear From Our Community
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Thousands have successfully made the UK their new home with our support.
+            Thousands of professionals have improved their job prospects with our structured application support.
           </p>
         </div>
 
