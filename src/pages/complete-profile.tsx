@@ -153,7 +153,7 @@ export default function ProfileCompletion() {
       const { error } = await authApi.completeProfileWithCv(formData);
 
       if (error) {
-        toast.error(error.message || 'Failed to complete profile');
+        toast.error('Failed to complete profile');
         return;
       }
 
@@ -179,9 +179,9 @@ export default function ProfileCompletion() {
     }
 
     try {
-      await authApi.skipProfileCompletion();
+      // await authApi.skipProfileCompletion();
       const loginUser = await authApi.getCurrentAuthUser();
-      if (loginUser?.Role === 'Admin') navigate('/admin');
+      if (loginUser?.role === 'Admin') navigate('/admin');
       else navigate('/dashboard');
     } catch {
       navigate('/dashboard');

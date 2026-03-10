@@ -78,7 +78,7 @@ export default function UserCompletion() {
     const mustUploadCv = isFirstTimeProfile && !user?.cvUrl && !cvFile;
 
   // Example: you might enforce completion for certain roles/plans
-  const mustCompleteForRole = user?.role === 'User' && isFirstTimeProfile; 
+  const mustCompleteForRole = user?.role === 'User' && isFirstTimeProfile; // adjust as needed
 
   const shouldDisableSkip = mustUploadCv || mustCompleteForRole;
   const skipDisabledReason = mustUploadCv
@@ -104,7 +104,6 @@ export default function UserCompletion() {
   useEffect(() => {
     if (user) {
       // Parse the JSON string if it exists
-      
       let jobPrefs = { jobTypes: [], yearsOfExperience: '', preferredLocations: [] };
       try {
         if (user.jobPreferencesJson) {
@@ -185,9 +184,9 @@ export default function UserCompletion() {
     }
 
     try {
-      await authApi.skipProfileCompletion();
+      //await authApi.skipProfileCompletion();
       const loginUser = await authApi.getCurrentAuthUser();
-      if (loginUser?.Role === 'Admin') navigate('/admin');
+      if (loginUser?.role === 'Admin') navigate('/admin');
       else navigate('/dashboard');
     } catch {
       navigate('/dashboard');

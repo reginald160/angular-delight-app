@@ -28,7 +28,7 @@ import ProfileCompletion from "./pages/complete-profile";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import VerifyOtp from "./pages/verify-signup";
-import Terms from "./pages/terms";
+import Terms from "./pages/Terms"
 import Privacy from "./pages/Privacy";
 import AdminInterviews from "./pages/admin/AdminInterviews";
 import MyApplications from "./pages/MyApplications";
