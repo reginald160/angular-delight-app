@@ -5,6 +5,8 @@ import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { authApi } from "@/services/AuthService";
+import Auth from "./Auth";
+import { useAuth } from "@/contexts/AuthContext";
 export interface PaymentDetails {
   success: boolean;
   status: string;
@@ -18,6 +20,7 @@ const PaymentSuccess = () => {
   const [loading, setLoading] = useState(true);
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { user,refreshUser } = useAuth();
     const navigate = useNavigate();
   useEffect(() => {
     const verifyPayment = async () => {
@@ -39,7 +42,7 @@ const PaymentSuccess = () => {
           navigate("/payment-canceled");
           return;
         }
-
+        refreshUser();
         setPaymentDetails(data);
       } catch (err: any) {
         setError(err.message || "Failed to verify payment");

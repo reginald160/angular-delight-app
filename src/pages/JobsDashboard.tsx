@@ -652,7 +652,7 @@ const ENABLE_AVAILABLE_JOBS = import.meta.env.VITE_ENABLE_AVAILABLE_JOBS === 'tr
               </div>
 
               <Button variant="outline" className="w-full" onClick={() => setProfileModalOpen(true)}>
-                Improve Profile
+                View Result
               </Button>
             </CardContent>
           </Card>

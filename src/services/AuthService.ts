@@ -258,6 +258,8 @@ id: string; // Guid
   cvUrl: string;
   profileCompletedAtUtc: string | null; // ISO Date string
   profileCompleted: boolean;
+  hasSubscription: boolean;
+  cvAnalysis: CVAnalysis
 }
 
 
@@ -318,6 +320,17 @@ class AuthApiService {
       });
 
       const data = await response.json().catch(() => null);
+
+          // 🔹 Handle Unauthorized
+    if (response.status === 401 || response.status === 403) {
+      const currentPage = window.location.pathname + window.location.search;
+
+      // Optional: clear invalid token
+      sessionStorage.removeItem("accessToken");
+
+      // Redirect to login with return URL
+      window.location.href = `/auth?redirect=${encodeURIComponent(currentPage)}`;
+    }
 
       if (!response.ok) {
         return {
@@ -399,7 +412,7 @@ class AuthApiService {
     
   ): Promise<{ data: LoginUser | null; error: AuthError | null }> {
     return this.request<LoginUser>('/Jobs/UpdateCVAnalysis', {
-      method: 'PUT',
+      method: 'GET',
       body: JSON.stringify(analysis),
     });
   }
@@ -488,10 +501,18 @@ class AuthApiService {
     });
     return result;
   }
+  
   async getCV(id:string): Promise<{ data: FileUploadDto | null; error: AuthError | null }> {
 
     const result =  this.request<FileUploadDto>("/files/GetCV");
     console.log("getCV result", result.then(res => console.log(res.data)));
+    return result;
+  }
+
+   async getCVAnalysis(): Promise<{ data: CVAnalysis | null; error: AuthError | null }> {
+
+    const result =  this.request<CVAnalysis>("/Jobs/GetCVAnalysis");
+
     return result;
   }
 

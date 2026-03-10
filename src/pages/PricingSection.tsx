@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useSubscription } from '@/hooks/useSubscription';
 import { authApi } from '@/services/AuthService';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 // const plans = [
 //   {
@@ -57,6 +58,7 @@ export function PricingSection() {
   };
 
   return (
+       <DashboardLayout>
     <section className="py-24 bg-background relative overflow-hidden">
       <div className="absolute top-0 right-0 w-96 h-96 bg-hero/5 rounded-full blur-3xl" />
       
@@ -110,6 +112,8 @@ export function PricingSection() {
         </div>
       </div>
     </section>
+       </DashboardLayout>
+
   );
 }
 

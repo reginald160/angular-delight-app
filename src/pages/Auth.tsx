@@ -79,42 +79,54 @@ export default function Auth() {
     },
   });
 
-  const handleLogin = async (data: LoginFormData) => {
-    setIsSubmitting(true);
-    const { error } = await signIn(data.email, data.password);
-    setIsSubmitting(false);
+const handleLogin = async (data: LoginFormData) => {
+  setIsSubmitting(true);
 
-    if (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        toast.error('Invalid email or password. Please try again.');
-      } else if (error.message.includes('Email not confirmed')) {
-        toast.error('Please verify your email before logging in.');
-         navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
-      } else if (error.message.includes('Please verify your email before logging in'))
-      {      toast.error(error.message);
-            navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
-            return;
-      }
-      else {
-        toast.error(error.message);
-      }
+  const { error } = await signIn(data.email, data.password);
+
+  setIsSubmitting(false);
+
+  if (error) {
+    if (error.message.includes('Invalid login credentials')) {
+      toast.error('Invalid email or password. Please try again.');
+    } 
+    else if (error.message.includes('Email not confirmed')) {
+      toast.error('Please verify your email before logging in.');
+      navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
+    } 
+    else if (error.message.includes('Please verify your email before logging in')) {
+      toast.error(error.message);
+      navigate(`/very-signup?email=${encodeURIComponent(data.email)}`);
       return;
+    } 
+    else {
+      toast.error(error.message);
     }
-    toast.success('Welcome back!');
 
-    const loginUser = await authApi.getCurrentAuthUser();
-    const role = loginUser.role;
-    if(role === 'Admin'){
-      navigate('/admin');
-    }
-    else{
-      navigate('/dashboard');
-    };
+    return;
+  }
 
+  toast.success('Welcome back!');
 
+  // 🔹 Get redirect URL if present
+  const params = new URLSearchParams(window.location.search);
+  const redirect = params.get("redirect");
 
+  if (redirect) {
+    navigate(redirect);
+    return;
+  }
 
-  };
+  // 🔹 fallback to role-based routing
+  const loginUser = await authApi.getCurrentAuthUser();
+  const role = loginUser.role;
+
+  if (role === "Admin") {
+    navigate("/admin");
+  } else {
+    navigate("/dashboard");
+  }
+};
 
   const CheckRole = async () => {
 

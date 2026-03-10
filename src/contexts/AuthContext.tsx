@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { authApi, AuthUser, LoginUser } from "@/services/AuthService";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import { authApi, LoginUser } from "@/services/AuthService";
 
 interface AuthContextType {
   user: LoginUser | null;
@@ -12,16 +18,19 @@ interface AuthContextType {
   ) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  updateUser: (updates: Partial<LoginUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return ctx;
 };
-
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -29,35 +38,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<LoginUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadCurrentUser = async (email: string) => {
+  const loadCurrentUser = useCallback(async (email?: string) => {
     try {
-      const { data, error } = await authApi.getCurrentUser(email); // GET /users/me
-      if (error || !data) {
+      const userEmail = email || sessionStorage.getItem("email") || "";
+
+      if (!userEmail) {
         setUser(null);
+        sessionStorage.removeItem("authUser");
         return;
       }
+
+      const { data, error } = await authApi.getCurrentUser(userEmail);
+
+      if (error || !data) {
+        setUser(null);
+        sessionStorage.removeItem("authUser");
+        return;
+      }
+
       setUser(data);
       sessionStorage.setItem("authUser", JSON.stringify(data));
     } catch {
       setUser(null);
+      sessionStorage.removeItem("authUser");
     }
-  };
+  }, []);
+
+  const refreshUser = useCallback(async () => {
+    await loadCurrentUser();
+  }, [loadCurrentUser]);
+
+  const updateUser = useCallback((updates: Partial<LoginUser>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      const updatedUser = { ...prev, ...updates };
+      sessionStorage.setItem("authUser", JSON.stringify(updatedUser));
+      return updatedUser;
+    });
+  }, []);
 
   useEffect(() => {
-    // run once on app mount
-    (async () => {
-      const token = sessionStorage.getItem("accessToken");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+    const initAuth = async () => {
+      try {
+        const token = sessionStorage.getItem("accessToken");
+        const cachedUser = sessionStorage.getItem("authUser");
 
-      await loadCurrentUser(sessionStorage.getItem("email") || "");
-      setLoading(false);
-       const cached = sessionStorage.getItem("authUser");
-      if (cached) setUser(JSON.parse(cached));
-    })();
-  }, []);
+        if (cachedUser) {
+          setUser(JSON.parse(cachedUser));
+        }
+
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
+        await loadCurrentUser();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+  }, [loadCurrentUser]);
 
   const signUp: AuthContextType["signUp"] = async (
     email,
@@ -65,10 +108,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     firstName,
     lastName
   ) => {
-    const { error } = await authApi.register(email, password, firstName, lastName);
-    if (error) return { error: new Error(error.message ?? String(error)) };
+    const { error } = await authApi.register(
+      email,
+      password,
+      firstName,
+      lastName
+    );
 
-    // Signup doesn't log in by default; user should verify email then login
+    if (error) {
+      return { error: new Error(error.message ?? String(error)) };
+    }
+
     return { error: null };
   };
 
@@ -81,22 +131,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     sessionStorage.setItem("accessToken", data.accessToken);
     sessionStorage.setItem("refreshToken", data.refreshToken);
-      sessionStorage.setItem("email", email);
+    sessionStorage.setItem("email", email);
 
-    // IMPORTANT: hydrate user immediately so ProtectedRoute passes
     await loadCurrentUser(email);
 
     return { error: null };
   };
 
   const signOut: AuthContextType["signOut"] = async () => {
-    // optional: call backend logout if you have it
-    // await authApi.logout(sessionStorage.getItem("refreshToken") ?? "");
-
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("authUser");
-    localStorage.removeItem("email");
+    sessionStorage.removeItem("accessToken");
+    sessionStorage.removeItem("refreshToken");
+    sessionStorage.removeItem("authUser");
+    sessionStorage.removeItem("email");
     setUser(null);
   };
 
@@ -108,6 +154,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         signUp,
         signIn,
         signOut,
+        refreshUser,
+        updateUser,
       }}
     >
       {children}

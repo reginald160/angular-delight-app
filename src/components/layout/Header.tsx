@@ -74,16 +74,24 @@ export function Header() {
           {user ? (
             <div className="flex items-center gap-4">
              <NavLink
-                to="/dashboard"
-                className={({ isActive }) =>
-                  cn(
-                    "text-sm font-medium transition-colors",
-                    isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  )
-                }
-              >
-                Dashboard
-              </NavLink>
+  to="/dashboard"
+  onClick={(e) => {
+    if (location.pathname === '/dashboard') {
+      // Prevent default if you want to handle "refresh" manually
+      // e.preventDefault(); 
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // You could also trigger a state refresh here
+    }
+  }}
+  className={({ isActive }) =>
+    cn(
+      "text-sm font-medium transition-colors",
+      isActive ? "text-foreground cursor-default" : "text-muted-foreground hover:text-foreground"
+    )
+  }
+>
+  Dashboard
+</NavLink>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">

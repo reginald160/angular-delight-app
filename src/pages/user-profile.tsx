@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -69,10 +69,10 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-export default function ProfileCompletion() {
+export default function UserCompletion() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cvFile, setCvFile] = useState<File | null>(null);
-  const { user, refreshUser, updateUser } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
    const isFirstTimeProfile = user ? !user.profileCompleted : true;
     const mustUploadCv = isFirstTimeProfile && !user?.cvUrl && !cvFile;
@@ -157,14 +157,19 @@ export default function ProfileCompletion() {
         return;
       }
 
-       updateUser({
-      profileCompleted: true
-    });
-
       toast.success('Profile completed successfully!');
-     
-         navigate('/price');
-      
+      return;
+      // const loginUser = await authApi.getCurrentAuthUser();
+      // if (loginUser?.Role === 'Admin'){
+      //     navigate('/admin');
+      //     return;
+      // }
+      // else{
+               
+      //  navigate('/dashboard');
+      //  return;
+      // }
+
     } catch {
       toast.error('Something went wrong. Please try again.');
     } finally {
@@ -434,6 +439,7 @@ export default function ProfileCompletion() {
                 {/* Actions */}
              
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
+    
 
                   <Button type="submit" variant="royal" className="sm:flex-1 h-12" disabled={isSubmitting}>
                     {isSubmitting ? (
