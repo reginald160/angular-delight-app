@@ -24,6 +24,7 @@ import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminChats from "./pages/admin/AdminChats";
 import AdminInterviews from "./pages/admin/AdminInterviews";
 import AdminApplications from "./pages/admin/AdminApplications";
+import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import MyInterviews from "./pages/MyInterviews";
 import MyApplications from "./pages/MyApplications";
 import EmailConfirmation from "./pages/EmailConfirmation";
