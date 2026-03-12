@@ -41,10 +41,10 @@ serve(async (req) => {
     if (!roleData) throw new Error("Unauthorized: admin role required");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const { action } = await req.json();
+    const body = await req.json();
+    const { action } = body;
 
     if (action === "list") {
-      // Get all subscriptions from DB
       const { data: subs, error: subsError } = await supabaseClient
         .from("user_subscriptions")
         .select("*")
@@ -52,14 +52,12 @@ serve(async (req) => {
 
       if (subsError) throw subsError;
 
-      // Enrich with user emails from profiles
       const userIds = subs?.map(s => s.user_id) || [];
       const { data: profiles } = await supabaseClient
         .from("profiles")
         .select("user_id, first_name, last_name")
-        .in("user_id", userIds);
+        .in("user_id", userIds.length > 0 ? userIds : ["none"]);
 
-      // Get emails from auth
       const enrichedSubs = await Promise.all((subs || []).map(async (sub) => {
         const profile = profiles?.find(p => p.user_id === sub.user_id);
         let email = null;
@@ -70,7 +68,7 @@ serve(async (req) => {
         return {
           ...sub,
           user_email: email,
-          user_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : null,
+          user_name: profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Unnamed' : 'Unnamed',
         };
       }));
 
@@ -80,14 +78,53 @@ serve(async (req) => {
     }
 
     if (action === "refund") {
-      const { stripe_customer_id } = await req.json().catch(() => ({}));
-      // Re-parse body
-      const body = JSON.parse(await new Request(req.url, { body: null }).text().catch(() => "{}"));
+      const { stripe_customer_id } = body;
+      if (!stripe_customer_id) throw new Error("stripe_customer_id required");
+
+      // Find the latest paid checkout session for this customer
+      const sessions = await stripe.checkout.sessions.list({
+        customer: stripe_customer_id,
+        status: "complete",
+        limit: 1,
+      });
+
+      if (sessions.data.length === 0) throw new Error("No completed sessions found");
+
+      const session = sessions.data[0];
+      if (!session.payment_intent) throw new Error("No payment intent found");
+
+      const paymentIntentId = typeof session.payment_intent === "string" 
+        ? session.payment_intent 
+        : session.payment_intent.id;
+
+      const refund = await stripe.refunds.create({
+        payment_intent: paymentIntentId,
+      });
+
+      // Update subscription status in DB
+      await supabaseClient
+        .from("user_subscriptions")
+        .update({ status: "refunded", tier: null, updated_at: new Date().toISOString() })
+        .eq("stripe_customer_id", stripe_customer_id);
+
+      return new Response(JSON.stringify({ success: true, refund_id: refund.id }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Re-parse for actions that need body params
-    // We already parsed once, so let's restructure
-    // Actually we parsed req.json() already. Let me fix this.
+    if (action === "cancel") {
+      const { subscription_id, stripe_customer_id } = body;
+      
+      // Update status in DB
+      await supabaseClient
+        .from("user_subscriptions")
+        .update({ status: "cancelled", tier: null, updated_at: new Date().toISOString() })
+        .eq("stripe_customer_id", stripe_customer_id);
+
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     return new Response(JSON.stringify({ error: "Unknown action" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
