@@ -1,7 +1,7 @@
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdmin } from '@/hooks/useAdmin';
-import { Briefcase, Users, Bell, MessageSquare, Loader2 } from 'lucide-react';
+import { Briefcase, Users, Bell, MessageSquare, Loader2, CreditCard } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 
 export default function AdminDashboard() {

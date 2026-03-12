@@ -14,7 +14,8 @@ import {
   Home,
   UserCheck,
   Calendar,
-  FileText
+  FileText,
+  CreditCard
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const navItems = [
   { path: '/admin/user-details', label: 'User Details', icon: UserCheck },
   { path: '/admin/notifications', label: 'Notifications', icon: Bell },
   { path: '/admin/chats', label: 'Chats', icon: MessageSquare },
+  { path: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
 ];
 
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
