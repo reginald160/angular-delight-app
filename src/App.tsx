@@ -71,6 +71,7 @@ const App = () => (
             <Route path="/admin/chats" element={<AuthGuard><AdminChats /></AuthGuard>} />
             <Route path="/admin/interviews" element={<AuthGuard><AdminInterviews /></AuthGuard>} />
             <Route path="/admin/applications" element={<AuthGuard><AdminApplications /></AuthGuard>} />
+            <Route path="/admin/subscriptions" element={<AuthGuard><AdminSubscriptions /></AuthGuard>} />
             <Route path="/dashboard/my-interviews" element={<AuthGuard><MyInterviews /></AuthGuard>} />
             <Route path="/dashboard/my-applications" element={<AuthGuard><MyApplications /></AuthGuard>} />
 
